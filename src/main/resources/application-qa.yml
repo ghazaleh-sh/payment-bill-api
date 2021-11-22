@@ -1,0 +1,53 @@
+
+server:
+  port: 9035
+  servlet:
+    context-path: /api/payment-bill
+
+spring:
+  jpa:
+    show-sql: false
+    open-in-view: false
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.DB2Dialect
+        format_sql: true
+        default_schema: db2inst1
+  datasource:
+    url: jdbc:db2://192.168.97.134:50000/BMI_API
+    username: db2inst1
+    password: 123456
+    driver-class-name: com.ibm.db2.jcc.DB2Driver
+
+#http://thirdparty:9080/api/v0
+sadad:
+  psp:
+    base-url: https://sadad.shaparak.ir/api/v0
+    payment:
+      init-address: /Request/PaymentRequest
+      verify-address: /Advice/Verify
+    merchant-id: "000000140331692"
+    terminal-id: "24056544"
+    return-url: "www.sample.com/returnedPage"
+    tripleDesKey: "hFI5UOwh9PUDbItN4k8/AacrnC5nTrk2"
+
+ipg:
+  request_token:
+    url: http://psp-payment-gateway-srv:9039/psp-payment-gateway/resources/ipg/BillRequest
+  verify_payment:
+    url: http://psp-payment-gateway-srv:9039/psp-payment-gateway/resources/ipg/verify
+
+
+tripleDesKey: tItCjTOXxbN72CYfwd08e2X/m6/Ny7wx
+
+invoice:
+  terminalId: 24095735
+  merchantId: 000000140336994
+  returnUrl: https://www.sadad.co.ir/returnedPage
+
+#  ticketVerificationUrl=http://sso:9080/session-manager/devices/verify
+#  tokenServerURL=http://sso:9080/identity/oauth2/auth/token
+#  authorizationPrefix=Basic a2V5OnNlY3JldA==
+#  scope=device-session-verification
