@@ -37,8 +37,6 @@ public class BasicWebClient<T, K> {
             log.info("response of external service >>>>>>>>>>>>>>>>>> ", response);
             return response;
         } catch (RestClientException e) {
-
-
             log.error("ERROR IS EXTERNAL SERVICE>>>>>>>>>>>>>>>>>", e);
             return null;
 //            throw new ServiceUnavailableException(serviceUnavailableMessage());
@@ -55,15 +53,15 @@ public class BasicWebClient<T, K> {
                     .uri(builder -> builder.path(urlQueryString)
                             .queryParam("Token", requestParamVO.getToken())
                             .queryParam("SignData", requestParamVO.getSignData())
-//                .queryParam("orderId", requestParamVO.getOrderId())
+//                               .queryParam("orderId", requestParamVO.getOrderId())
                             .build())
 //                    .body(BodyInserters.fromValue(request.body)), new ParameterizedTypeReference<T>() {
 //                    })
                     .retrieve()
                     .bodyToMono(responseType)
-//                    .onErrorMap(e -> {
-//                        return new ServiceUnavailableException(serviceUnavailableMessage());
-//                    })
+                    .onErrorMap(e -> {
+                        return new ServiceUnavailableException("service.unavailable");
+                    })
                     .block();
 
             log.info("response of external service >>>>>>>>>>>>>>>>>> ", response);
@@ -79,7 +77,6 @@ public class BasicWebClient<T, K> {
     }
 
     public K doCallService(T body, String headerToken, String urlQueryString, Class<K> responseType) {
-
         try {
             K response = webClient
                     .post()
@@ -98,12 +95,9 @@ public class BasicWebClient<T, K> {
             log.info("response of external service >>>>>>>>>>>>>>>>>> ", response);
             return response;
         } catch (RestClientException e) {
-
-
             log.error("ERROR IS EXTERNAL SERVICE>>>>>>>>>>>>>>>>>", e);
             throw new ServiceUnavailableException(e.getMessage());
 
         }
-
     }
 }

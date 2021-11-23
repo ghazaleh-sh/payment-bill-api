@@ -13,7 +13,7 @@ import java.security.*;
 
 public class TripleDES {
 
-    private static String TRIPLE_DES_TRANSFORMATION = "DESede/ECB/PKCS5Padding";
+    private static String TRIPLE_DES_TRANSFORMATION = "DESede/ECB/PKCS7Padding";
     private static String ALGORITHM = "DESede";
     private static String BOUNCY_CASTLE_PROVIDER = "BC";
     private static final String UNICODE_FORMAT = "UTF8";

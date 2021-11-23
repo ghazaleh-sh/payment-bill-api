@@ -3,7 +3,10 @@ package ir.co.sadad.paymentBill.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ir.co.sadad.paymentBill.RequestParamVO;
+import ir.co.sadad.paymentBill.dtos.GeneralRegistrationResponse;
+import ir.co.sadad.paymentBill.dtos.GeneralVerificationResponse;
 import ir.co.sadad.paymentBill.dtos.GlobalErrorResponse;
+import ir.co.sadad.paymentBill.dtos.PspInvoiceRegistrationReqDto;
 import ir.co.sadad.paymentBill.dtos.ipg.IPGPaymentRequestReqDto;
 import ir.co.sadad.paymentBill.dtos.ipg.IPGPaymentRequestResDto;
 import ir.co.sadad.paymentBill.dtos.ipg.IPGVerifyReqDto;
@@ -46,25 +49,29 @@ public class SadadPspService {
 
 
     public GeneralRegistrationResponse registerInvoiceByPsp(PspInvoiceRegistrationReqDto pspInvoiceRegistrationReq) {
-//        Response result = client.target(baseUrl).path("/TokenizedBillPaymentApi/BillRequest").request()
-//                .accept(MediaType.APPLICATION_JSON).post(Entity.json(pspInvoiceRegistrationRequest));
         try {
             GeneralRegistrationResponse generalRegistrationResponse = registerInvoiceWebClient.doCallService(
                     pspInvoiceRegistrationReq,
                     sadadBaseUrl + "/TokenizedBillPaymentApi/BillRequest",
                     GeneralRegistrationResponse.class);
 
-            if(generalRegistrationResponse.getResCode() == "0") {
+//            if (generalRegistrationResponse.getResCode() == "0") {
+//                return generalRegistrationResponse;
+//            }
+//            //TODO:replace 502 with correct value
+//            if (generalRegistrationResponse.getResCode() == "502") {
+//                throw new CodedException(ExceptionType.PaymentAPIConnectionException, "E5000001", "EINP50010003");
+//            }
+
+            if (generalRegistrationResponse != null)
                 return generalRegistrationResponse;
-            }
-            //TODO:replace 502 with correct value
-            if (generalRegistrationResponse.getResCode() == "502" ){
-                throw new CodedException(ExceptionType.PaymentAPIConnectionException,"E5000001","EINP50010003");
-            }
-        }catch (Exception e){
-            throw new CodedException(ExceptionType.PaymentAPIConnectionException,"E5000002","EINP50010003");
+            else
+                throw new ServiceUnavailableException("payment.request.unavailable");
+//
+        } catch (Exception e) {
+            throw new CodedException(ExceptionType.PaymentAPIConnectionException, "E5000002", "EINP50010003");
         }
-        throw new CodedException(ExceptionType.PaymentAPIConnectionException,"E5000003","EINP50010003");
+
     }
 
     public GeneralRegistrationResponse registerPayment(PspPaymentRegistrationRegistrationRequest pspPaymentRegistrationRequest) {
@@ -73,8 +80,6 @@ public class SadadPspService {
                 sadadBaseUrl + "/Request/PaymentRequest",
                 GeneralRegistrationResponse.class);
 
-//        GeneralRegistrationResponse generalRegistrationResponse = client.target(baseUrl).path("/Request/PaymentRequest").request()
-//                .accept(MediaType.APPLICATION_JSON).post(Entity.json(pspPaymentRegistrationRequest)).readEntity(GeneralRegistrationResponse.class);
         return generalRegistrationResponse;
     }
 

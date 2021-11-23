@@ -1,6 +1,6 @@
 package ir.co.sadad.paymentBill.validations;
 
-import ir.co.sadad.paymentBill.dtos.InvoiceVerifyDto;
+import ir.co.sadad.paymentBill.dtos.InvoiceVerifyReqDto;
 import ir.co.sadad.paymentBill.entities.Invoice;
 import ir.co.sadad.paymentBill.enums.ExceptionType;
 import ir.co.sadad.paymentBill.enums.PaymentStatus;
@@ -15,7 +15,7 @@ import javax.validation.ConstraintValidatorContext;
 import java.util.Optional;
 
 @Priority(10)
-public class VerifyValidator implements ConstraintValidator<VerifyValid, InvoiceVerifyDto> {
+public class VerifyValidator implements ConstraintValidator<VerifyValid, InvoiceVerifyReqDto> {
 
 
     @Autowired
@@ -28,10 +28,10 @@ public class VerifyValidator implements ConstraintValidator<VerifyValid, Invoice
     }
 
     @Override
-    public boolean isValid(InvoiceVerifyDto invoiceVerifyDto, ConstraintValidatorContext constraintValidatorContext) {
-        if (invoiceVerifyDto == null)
+    public boolean isValid(InvoiceVerifyReqDto invoiceVerifyReqDto, ConstraintValidatorContext constraintValidatorContext) {
+        if (invoiceVerifyReqDto == null)
             throw new CodedException(ExceptionType.IllegalArgumentCoddedException,"E400086","illegal_argument");
-        String orderId = invoiceVerifyDto.getOrderId();
+        String orderId = invoiceVerifyReqDto.getOrderId();
         try {
             Long.parseLong(orderId);
         } catch (RuntimeException e) {

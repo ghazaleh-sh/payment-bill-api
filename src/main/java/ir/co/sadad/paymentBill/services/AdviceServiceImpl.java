@@ -1,5 +1,7 @@
 package ir.co.sadad.paymentBill.services;
 
+import ir.co.sadad.paymentBill.dtos.GeneralRegistrationResponse;
+import ir.co.sadad.paymentBill.dtos.GeneralVerificationResponse;
 import ir.co.sadad.paymentBill.exceptions.TokenGenerationException;
 import ir.co.sadad.paymentBill.common.Encoder;
 import ir.co.sadad.paymentBill.dtos.payment.*;
@@ -8,14 +10,13 @@ import ir.co.sadad.paymentBill.exceptions.CodedException;
 import ir.co.sadad.paymentBill.common.ResourceBundleFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-
+@Deprecated
 @Slf4j
 @RequiredArgsConstructor
 @Service

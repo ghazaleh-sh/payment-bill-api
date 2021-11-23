@@ -1,9 +1,10 @@
 package ir.co.sadad.paymentBill.services;
 
 import ir.co.sadad.paymentBill.UserVO;
-import ir.co.sadad.paymentBill.dtos.InvoiceRequestDto;
-import ir.co.sadad.paymentBill.dtos.InvoiceVerifyDto;
+import ir.co.sadad.paymentBill.dtos.InvoicePaymantReqDto;
+import ir.co.sadad.paymentBill.dtos.InvoiceVerifyReqDto;
 import ir.co.sadad.paymentBill.dtos.ipg.FinalBillPaymentResDto;
+import ir.co.sadad.paymentBill.dtos.GeneralRegistrationResponse;
 import ir.co.sadad.paymentBill.entities.Invoice;
 
 public interface InvoicePaymentService {
@@ -12,9 +13,9 @@ public interface InvoicePaymentService {
 
 //    String getToken(InvoiceRegistration invoiceRegistration);
 
-    InvoiceVerifyDto invoiceRegister(InvoiceRequestDto invoiceRequestDto);
+    GeneralRegistrationResponse invoiceRegister(InvoicePaymantReqDto invoicePaymantReqDto);
 
-    InvoiceVerifyDto BillPaymentByIpg(InvoiceRequestDto invoiceRequestDto, UserVO userVo, String authToken);
+    InvoiceVerifyReqDto BillPaymentByIpg(InvoicePaymantReqDto invoicePaymantReqDto, UserVO userVo, String authToken);
 
-    FinalBillPaymentResDto finalBillPaymentByIpg(InvoiceVerifyDto invoiceVerifyDto);
+    FinalBillPaymentResDto finalBillPaymentByIpg(InvoiceVerifyReqDto invoiceVerifyReqDto);
 }

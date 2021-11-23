@@ -1,6 +1,6 @@
 package ir.co.sadad.paymentBill.validations;
 
-import ir.co.sadad.paymentBill.dtos.InvoiceRequestDto;
+import ir.co.sadad.paymentBill.dtos.InvoicePaymantReqDto;
 import ir.co.sadad.paymentBill.enums.ExceptionType;
 import ir.co.sadad.paymentBill.exceptions.CodedException;
 
@@ -10,15 +10,15 @@ import javax.validation.ConstraintValidatorContext;
 import java.math.BigDecimal;
 
 @Priority(10)
-public class InvoiceValidator implements ConstraintValidator<InvoiceValid, InvoiceRequestDto> {
+public class InvoiceValidator implements ConstraintValidator<InvoiceValid, InvoicePaymantReqDto> {
 
     @Override
-    public boolean isValid(InvoiceRequestDto invoiceRequestDto, ConstraintValidatorContext constraintValidatorContext) {
+    public boolean isValid(InvoicePaymantReqDto invoicePaymantReqDto, ConstraintValidatorContext constraintValidatorContext) {
 
-        if (invoiceRequestDto == null) {
+        if (invoicePaymantReqDto == null) {
             return false;
         }
-        checkInvoiceValidation(Long.toString(Long.parseLong(invoiceRequestDto.getInvoiceNumber())), Long.toString(Long.parseLong(invoiceRequestDto.getPaymentNumber())), new BigDecimal(invoiceRequestDto.getAmount()));
+        checkInvoiceValidation(Long.toString(Long.parseLong(invoicePaymantReqDto.getInvoiceNumber())), Long.toString(Long.parseLong(invoicePaymantReqDto.getPaymentNumber())), new BigDecimal(invoicePaymantReqDto.getAmount()));
         return true;
     }
 

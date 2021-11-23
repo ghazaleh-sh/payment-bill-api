@@ -2,17 +2,8 @@ package ir.co.sadad.paymentBill.dtos;
 
 import javax.validation.constraints.NotBlank;
 
-public class InvoiceRequestDto {
+public class InvoicePaymantReqDto {
 
-    //    public InvoiceRequestDto(){
-//
-//    }
-//
-//    public InvoiceRequestDto(String invoiceNumber, String paymentNumber, String amount){
-//        this.invoiceNumber=invoiceNumber;
-//        this.paymentNumber=paymentNumber;
-//        this.amount=amount;
-//    }
     @NotBlank
     private String invoiceNumber;
     @NotBlank

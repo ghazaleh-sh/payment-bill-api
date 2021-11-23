@@ -1,14 +1,14 @@
 package ir.co.sadad.paymentBill.services;
 
 import ir.co.sadad.paymentBill.UserVO;
-import ir.co.sadad.paymentBill.dtos.InvoiceRequestDto;
-import ir.co.sadad.paymentBill.dtos.InvoiceVerifyDto;
+import ir.co.sadad.paymentBill.dtos.InvoicePaymantReqDto;
+import ir.co.sadad.paymentBill.dtos.InvoiceVerifyReqDto;
 import ir.co.sadad.paymentBill.dtos.ipg.FinalBillPaymentResDto;
 import ir.co.sadad.paymentBill.dtos.ipg.IPGPaymentRequestReqDto;
 import ir.co.sadad.paymentBill.dtos.ipg.IPGVerifyReqDto;
-import ir.co.sadad.paymentBill.dtos.payment.GeneralRegistrationResponse;
-import ir.co.sadad.paymentBill.dtos.payment.GeneralVerificationResponse;
-import ir.co.sadad.paymentBill.dtos.payment.PspInvoiceRegistrationReqDto;
+import ir.co.sadad.paymentBill.dtos.GeneralRegistrationResponse;
+import ir.co.sadad.paymentBill.dtos.GeneralVerificationResponse;
+import ir.co.sadad.paymentBill.dtos.PspInvoiceRegistrationReqDto;
 import ir.co.sadad.paymentBill.dtos.payment.PaymentVerificationResponse;
 import ir.co.sadad.paymentBill.entities.Invoice;
 import ir.co.sadad.paymentBill.entities.PayRequest;
@@ -30,8 +30,6 @@ import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -64,8 +62,6 @@ public class InvoicePaymentServiceImpl implements InvoicePaymentService {
 
 //    TokenDecoder tokenDecoder;
 
-    private HttpServletRequest request;
-
     @Override
     public Invoice verifyInvoicePayment(String token, String orderId) {
 
@@ -79,38 +75,37 @@ public class InvoicePaymentServiceImpl implements InvoicePaymentService {
 
     @SneakyThrows
     @Override
-    public InvoiceVerifyDto invoiceRegister(InvoiceRequestDto invoiceRequestDto) {
+    public GeneralRegistrationResponse invoiceRegister(InvoicePaymantReqDto invoicePaymantReqDto) {
 
         String userId = "158";
         String cellPhone ="09218301631";
         String serialId = "5700cd58-3cd6-4ce3-81ff-ee519e1f6df7";
-        String authToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJncmFudCI6IkNMSUVOVCIsImlzcyI6Imh0dHA6Ly9hcGkuYm1pLmlyL3NlY3VyaXR5IiwiYXVkIjoia2V5IiwiZXhwIjoxNjM3MTI5NjQxNzQxLCJuYmYiOjE2MzcwNDMyNDE3NDEsInJvbGUiOiIiLCJzZXJpYWwiOiIzYTY2YTFkMC00NTE1LTNhMjMtOTFmMS03NzYzMzA4NmI1OGUiLCJzc24iOiIxMjMiLCJjbGllbnRfaWQiOiIxMjMiLCJzY29wZXMiOlsiY3VzdG9tZXItc3VwZXIiXX0=.fNPgh_2w-r5mYzwhKN2tTyf_YOYQ6YV3GkEail6S3ck";
-        String ssn = "0079993141";
 
-
-        Invoice savedinvoice = invoiceCreation(invoiceRequestDto, UserVO.of(userId, cellPhone, serialId));
+        Invoice savedinvoice = invoiceCreation(invoicePaymantReqDto, UserVO.of(userId, cellPhone, serialId));
 
         PspInvoiceRegistrationReqDto pspInvoiceRegistrationReqDto = prepareInvoiceRegistration(savedinvoice);
 
         String signData = encoder.prepareSignDataForRegistration(pspInvoiceRegistrationReqDto.getTerminalId(), String.valueOf(pspInvoiceRegistrationReqDto.getOrderId()), pspInvoiceRegistrationReqDto.getAmount());
         pspInvoiceRegistrationReqDto.setSignData(signData);
         GeneralRegistrationResponse generalRegistrationResponse = sadadPspService.registerInvoiceByPsp(pspInvoiceRegistrationReqDto);
-        String token = processGetTokenResponse(generalRegistrationResponse);
+        return generalRegistrationResponse;
 
-        InvoiceVerifyDto verifyResponse = new InvoiceVerifyDto();
-        verifyResponse.setOrderId(String.valueOf(savedinvoice.getOrderId()));
-        verifyResponse.setToken(token);
-        return verifyResponse;
+//        String token = processGetTokenResponse(generalRegistrationResponse);
+
+//        InvoiceVerifyReqDto verifyResponse = new InvoiceVerifyReqDto();
+//        verifyResponse.setOrderId(String.valueOf(savedinvoice.getOrderId()));
+//        verifyResponse.setToken(token);
+//        return verifyResponse;
     }
 
     @Override
-    public InvoiceVerifyDto BillPaymentByIpg(InvoiceRequestDto invoiceRequestDto, UserVO userVo, String authToken){
+    public InvoiceVerifyReqDto BillPaymentByIpg(InvoicePaymantReqDto invoicePaymantReqDto, UserVO userVo, String authToken){
 
-        Invoice savedinvoice = invoiceCreation(invoiceRequestDto, userVo);
+        Invoice savedinvoice = invoiceCreation(invoicePaymantReqDto, userVo);
 
-        String pspToken = sadadPspService.requestPaymentByIpg(makeIpgPaymentRequest(savedinvoice,invoiceRequestDto,userVo) , authToken);
+        String pspToken = sadadPspService.requestPaymentByIpg(makeIpgPaymentRequest(savedinvoice, invoicePaymantReqDto,userVo) , authToken);
 
-        InvoiceVerifyDto billPaymentResDto = new InvoiceVerifyDto();
+        InvoiceVerifyReqDto billPaymentResDto = new InvoiceVerifyReqDto();
         billPaymentResDto.setToken(pspToken);
         billPaymentResDto.setOrderId(savedinvoice.getOrderId().toString());
         return billPaymentResDto;
@@ -118,11 +113,11 @@ public class InvoicePaymentServiceImpl implements InvoicePaymentService {
     }
 
     @Override
-    public FinalBillPaymentResDto finalBillPaymentByIpg(InvoiceVerifyDto invoiceVerifyDto){
+    public FinalBillPaymentResDto finalBillPaymentByIpg(InvoiceVerifyReqDto invoiceVerifyReqDto){
         //Validated before
-        Optional<Invoice> singleResult = invoiceRepository.findByOrderId(Long.valueOf(invoiceVerifyDto.getOrderId()));
+        Optional<Invoice> singleResult = invoiceRepository.findByOrderId(Long.valueOf(invoiceVerifyReqDto.getOrderId()));
 
-        GeneralVerificationResponse generalVerificationResponse = sadadPspService.verifyBillPaymentByIpg(makeIpgVerifyRequest(invoiceVerifyDto,singleResult.get().getUserId()));
+        GeneralVerificationResponse generalVerificationResponse = sadadPspService.verifyBillPaymentByIpg(makeIpgVerifyRequest(invoiceVerifyReqDto,singleResult.get().getUserId()));
 
         processVerifyResponse(processVerifyResponse(generalVerificationResponse));
 
@@ -131,20 +126,20 @@ public class InvoicePaymentServiceImpl implements InvoicePaymentService {
         return finalResponse;
     }
 
-    private IPGPaymentRequestReqDto makeIpgPaymentRequest(Invoice savedinvoice, InvoiceRequestDto invoiceRequestDto, UserVO user){
+    private IPGPaymentRequestReqDto makeIpgPaymentRequest(Invoice savedinvoice, InvoicePaymantReqDto invoicePaymantReqDto, UserVO user){
         IPGPaymentRequestReqDto req = new IPGPaymentRequestReqDto();
-        req.setAmount(Long.valueOf(invoiceRequestDto.getAmount()));
+        req.setAmount(Long.valueOf(invoicePaymantReqDto.getAmount()));
         req.setServiceType(PAYMENT_BILL_SERVICE_TYPE);
         req.setRequestId(savedinvoice.getOrderId().toString());
         req.setUserDeviceId(user.getSerialId());
         req.setUserId(user.getUserId());
         req.setSsn(user.getSsn());
-        req.setInvoiceNumber(invoiceRequestDto.getInvoiceNumber());
-        req.setPaymentNumber(invoiceRequestDto.getPaymentNumber());
+        req.setInvoiceNumber(invoicePaymantReqDto.getInvoiceNumber());
+        req.setPaymentNumber(invoicePaymantReqDto.getPaymentNumber());
         return req;
     }
 
-    private IPGVerifyReqDto makeIpgVerifyRequest(InvoiceVerifyDto req, String userId) {
+    private IPGVerifyReqDto makeIpgVerifyRequest(InvoiceVerifyReqDto req, String userId) {
         IPGVerifyReqDto ipgVerifyReq = new IPGVerifyReqDto();
         ipgVerifyReq.setRequestId(req.getOrderId());
         ipgVerifyReq.setToken(req.getToken());
@@ -153,9 +148,9 @@ public class InvoicePaymentServiceImpl implements InvoicePaymentService {
         return ipgVerifyReq;
     }
 
-    private Invoice invoiceCreation(InvoiceRequestDto invoiceRequestDto, UserVO userVo){
-        Optional<Invoice> invoice = invoiceRepository.findByInvoiceNumberAndPaymentNumber(invoiceRequestDto.getInvoiceNumber(), invoiceRequestDto.getPaymentNumber());
-        Invoice savedinvoice = invoice.orElse(makeNewInvoice(invoiceRequestDto, userVo));
+    private Invoice invoiceCreation(InvoicePaymantReqDto invoicePaymantReqDto, UserVO userVo){
+        Optional<Invoice> invoice = invoiceRepository.findByInvoiceNumberAndPaymentNumber(invoicePaymantReqDto.getInvoiceNumber(), invoicePaymantReqDto.getPaymentNumber());
+        Invoice savedinvoice = invoice.orElse(makeNewInvoice(invoicePaymantReqDto, userVo));
 
         if (savedinvoice.getPaymentStatus().equals(PaymentStatus.PAID)) {
             throw new CodedException(ExceptionType.DuplicateResourceCodedException, "E4090001", "EINP40010001");
@@ -176,14 +171,14 @@ public class InvoicePaymentServiceImpl implements InvoicePaymentService {
         return savedinvoice;
     }
 
-    private Invoice makeNewInvoice(InvoiceRequestDto invoiceRequestDto, UserVO userVo) {
-        InvoiceType invoiceType = InvoiceType.getEnum(Integer.parseInt(invoiceRequestDto.getInvoiceNumber().substring(invoiceRequestDto.getInvoiceNumber().length() - 2, invoiceRequestDto.getInvoiceNumber().length() - 1)));
+    private Invoice makeNewInvoice(InvoicePaymantReqDto invoicePaymantReqDto, UserVO userVo) {
+        InvoiceType invoiceType = InvoiceType.getEnum(Integer.parseInt(invoicePaymantReqDto.getInvoiceNumber().substring(invoicePaymantReqDto.getInvoiceNumber().length() - 2, invoicePaymantReqDto.getInvoiceNumber().length() - 1)));
 
         Invoice savedInvoice = new Invoice();
-        savedInvoice.setInvoiceNumber(invoiceRequestDto.getInvoiceNumber());
-        savedInvoice.setPaymentNumber(invoiceRequestDto.getPaymentNumber());
+        savedInvoice.setInvoiceNumber(invoicePaymantReqDto.getInvoiceNumber());
+        savedInvoice.setPaymentNumber(invoicePaymantReqDto.getPaymentNumber());
         savedInvoice.setInvoiceType(invoiceType);
-        savedInvoice.setAmount(new BigDecimal(invoiceRequestDto.getAmount()));
+        savedInvoice.setAmount(new BigDecimal(invoicePaymantReqDto.getAmount()));
         savedInvoice.setServiceMethod(ServiceMethod.BY_CARD);
         savedInvoice.setPaymentStatus(PaymentStatus.INCONCLUSIVE);
         savedInvoice.setChannel(Channel.HAM_BAAM);
@@ -200,15 +195,13 @@ public class InvoicePaymentServiceImpl implements InvoicePaymentService {
 
         return new PspInvoiceRegistrationReqDto.Builder().terminalId(this.terminalId)
                 .merchantId(this.merchantId)
-                .amount(String.valueOf(invoice.getAmount()))
+                .amount(String.valueOf(invoice.getAmount().intValue()))
                 .invoiceNumber(invoice.getInvoiceNumber())
                 .paymentNumber(invoice.getPaymentNumber())
                 .returnUrl(this.returnUrl)
                 .orderId(invoice.getOrderId())
                 .build();
-
     }
-
 
     /**
      *  process

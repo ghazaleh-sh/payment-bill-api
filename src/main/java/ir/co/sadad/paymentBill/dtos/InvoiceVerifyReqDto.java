@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Setter
 @Getter
-public class InvoiceVerifyDto {
+public class InvoiceVerifyReqDto {
 
     private String token;
     private String orderId;
