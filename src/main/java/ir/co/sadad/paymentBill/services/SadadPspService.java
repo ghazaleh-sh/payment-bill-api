@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import ir.co.sadad.paymentBill.RequestParamVO;
 import ir.co.sadad.paymentBill.dtos.GeneralRegistrationResponse;
 import ir.co.sadad.paymentBill.dtos.GeneralVerificationResponse;
-import ir.co.sadad.paymentBill.dtos.GlobalErrorResponse;
+import ir.co.sadad.paymentBill.exceptions.GlobalErrorResponse;
 import ir.co.sadad.paymentBill.dtos.PspInvoiceRegistrationReqDto;
 import ir.co.sadad.paymentBill.dtos.ipg.IPGPaymentRequestReqDto;
 import ir.co.sadad.paymentBill.dtos.ipg.IPGPaymentRequestResDto;

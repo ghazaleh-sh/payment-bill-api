@@ -1,6 +1,5 @@
 package ir.co.sadad.paymentBill.exceptions;
 
-import ir.co.sadad.paymentBill.dtos.GlobalErrorResponse;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 

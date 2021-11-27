@@ -1,4 +1,4 @@
-package ir.co.sadad.paymentBill.dtos;
+package ir.co.sadad.paymentBill.exceptions;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

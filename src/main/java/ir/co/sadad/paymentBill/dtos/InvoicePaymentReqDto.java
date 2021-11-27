@@ -2,7 +2,7 @@ package ir.co.sadad.paymentBill.dtos;
 
 import javax.validation.constraints.NotBlank;
 
-public class InvoicePaymantReqDto {
+public class InvoicePaymentReqDto {
 
     @NotBlank
     private String invoiceNumber;

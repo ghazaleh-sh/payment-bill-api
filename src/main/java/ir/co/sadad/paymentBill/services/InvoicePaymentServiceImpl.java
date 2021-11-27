@@ -1,8 +1,9 @@
 package ir.co.sadad.paymentBill.services;
 
 import ir.co.sadad.paymentBill.UserVO;
-import ir.co.sadad.paymentBill.dtos.InvoicePaymantReqDto;
+import ir.co.sadad.paymentBill.dtos.InvoicePaymentReqDto;
 import ir.co.sadad.paymentBill.dtos.InvoiceVerifyReqDto;
+import ir.co.sadad.paymentBill.dtos.ipg.FinalBillPaymentReqDto;
 import ir.co.sadad.paymentBill.dtos.ipg.FinalBillPaymentResDto;
 import ir.co.sadad.paymentBill.dtos.ipg.IPGPaymentRequestReqDto;
 import ir.co.sadad.paymentBill.dtos.ipg.IPGVerifyReqDto;
@@ -15,6 +16,7 @@ import ir.co.sadad.paymentBill.entities.PayRequest;
 import ir.co.sadad.paymentBill.entities.PayRequestInvoice;
 import ir.co.sadad.paymentBill.entities.Payee;
 import ir.co.sadad.paymentBill.enums.*;
+import ir.co.sadad.paymentBill.exceptions.BillPaymentException;
 import ir.co.sadad.paymentBill.exceptions.CodedException;
 import ir.co.sadad.paymentBill.exceptions.TokenGenerationException;
 import ir.co.sadad.paymentBill.repositories.InvoiceRepository;
@@ -28,6 +30,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -75,13 +78,13 @@ public class InvoicePaymentServiceImpl implements InvoicePaymentService {
 
     @SneakyThrows
     @Override
-    public GeneralRegistrationResponse invoiceRegister(InvoicePaymantReqDto invoicePaymantReqDto) {
+    public GeneralRegistrationResponse invoiceRegister(InvoicePaymentReqDto invoicePaymentReqDto) {
 
         String userId = "158";
         String cellPhone ="09218301631";
         String serialId = "5700cd58-3cd6-4ce3-81ff-ee519e1f6df7";
 
-        Invoice savedinvoice = invoiceCreation(invoicePaymantReqDto, UserVO.of(userId, cellPhone, serialId));
+        Invoice savedinvoice = invoiceCreation(invoicePaymentReqDto, UserVO.of(userId, cellPhone, serialId));
 
         PspInvoiceRegistrationReqDto pspInvoiceRegistrationReqDto = prepareInvoiceRegistration(savedinvoice);
 
@@ -99,11 +102,11 @@ public class InvoicePaymentServiceImpl implements InvoicePaymentService {
     }
 
     @Override
-    public InvoiceVerifyReqDto BillPaymentByIpg(InvoicePaymantReqDto invoicePaymantReqDto, UserVO userVo, String authToken){
+    public InvoiceVerifyReqDto BillPaymentByIpg(InvoicePaymentReqDto invoicePaymentReqDto, UserVO userVo, String authToken){
 
-        Invoice savedinvoice = invoiceCreation(invoicePaymantReqDto, userVo);
+        Invoice savedinvoice = invoiceCreation(invoicePaymentReqDto, userVo);
 
-        String pspToken = sadadPspService.requestPaymentByIpg(makeIpgPaymentRequest(savedinvoice, invoicePaymantReqDto,userVo) , authToken);
+        String pspToken = sadadPspService.requestPaymentByIpg(makeIpgPaymentRequest(savedinvoice, invoicePaymentReqDto,userVo) , authToken);
 
         InvoiceVerifyReqDto billPaymentResDto = new InvoiceVerifyReqDto();
         billPaymentResDto.setToken(pspToken);
@@ -113,11 +116,14 @@ public class InvoicePaymentServiceImpl implements InvoicePaymentService {
     }
 
     @Override
-    public FinalBillPaymentResDto finalBillPaymentByIpg(InvoiceVerifyReqDto invoiceVerifyReqDto){
-        //Validated before
-        Optional<Invoice> singleResult = invoiceRepository.findByOrderId(Long.valueOf(invoiceVerifyReqDto.getOrderId()));
+    public FinalBillPaymentResDto finalBillPaymentByIpg(FinalBillPaymentReqDto finalBillPaymentReqDto){
+        //TODO: must be Validate before
+        Optional<Invoice> singleResult = invoiceRepository.findByOrderId(Long.valueOf(finalBillPaymentReqDto.getRequestId()));
 
-        GeneralVerificationResponse generalVerificationResponse = sadadPspService.verifyBillPaymentByIpg(makeIpgVerifyRequest(invoiceVerifyReqDto,singleResult.get().getUserId()));
+        if(!finalBillPaymentReqDto.getUserId().equals(singleResult.get().getUserId()))
+            throw new BillPaymentException("userId.is.not.the.same", HttpStatus.BAD_REQUEST);
+
+        GeneralVerificationResponse generalVerificationResponse = sadadPspService.verifyBillPaymentByIpg(makeIpgVerifyRequest(finalBillPaymentReqDto));
 
         processVerifyResponse(processVerifyResponse(generalVerificationResponse));
 
@@ -126,59 +132,59 @@ public class InvoicePaymentServiceImpl implements InvoicePaymentService {
         return finalResponse;
     }
 
-    private IPGPaymentRequestReqDto makeIpgPaymentRequest(Invoice savedinvoice, InvoicePaymantReqDto invoicePaymantReqDto, UserVO user){
+    private IPGPaymentRequestReqDto makeIpgPaymentRequest(Invoice savedinvoice, InvoicePaymentReqDto invoicePaymentReqDto, UserVO user){
         IPGPaymentRequestReqDto req = new IPGPaymentRequestReqDto();
-        req.setAmount(Long.valueOf(invoicePaymantReqDto.getAmount()));
+        req.setAmount(Long.valueOf(invoicePaymentReqDto.getAmount()));
         req.setServiceType(PAYMENT_BILL_SERVICE_TYPE);
         req.setRequestId(savedinvoice.getOrderId().toString());
         req.setUserDeviceId(user.getSerialId());
         req.setUserId(user.getUserId());
         req.setSsn(user.getSsn());
-        req.setInvoiceNumber(invoicePaymantReqDto.getInvoiceNumber());
-        req.setPaymentNumber(invoicePaymantReqDto.getPaymentNumber());
+        req.setInvoiceNumber(invoicePaymentReqDto.getInvoiceNumber());
+        req.setPaymentNumber(invoicePaymentReqDto.getPaymentNumber());
         return req;
     }
 
-    private IPGVerifyReqDto makeIpgVerifyRequest(InvoiceVerifyReqDto req, String userId) {
+    private IPGVerifyReqDto makeIpgVerifyRequest(FinalBillPaymentReqDto req) {
         IPGVerifyReqDto ipgVerifyReq = new IPGVerifyReqDto();
-        ipgVerifyReq.setRequestId(req.getOrderId());
+        ipgVerifyReq.setRequestId(req.getRequestId());
         ipgVerifyReq.setToken(req.getToken());
-        ipgVerifyReq.setUserId(userId);
+        ipgVerifyReq.setUserId(req.getUserId());
         ipgVerifyReq.setServiceType(PAYMENT_BILL_SERVICE_TYPE);
         return ipgVerifyReq;
     }
 
-    private Invoice invoiceCreation(InvoicePaymantReqDto invoicePaymantReqDto, UserVO userVo){
-        Optional<Invoice> invoice = invoiceRepository.findByInvoiceNumberAndPaymentNumber(invoicePaymantReqDto.getInvoiceNumber(), invoicePaymantReqDto.getPaymentNumber());
-        Invoice savedinvoice = invoice.orElse(makeNewInvoice(invoicePaymantReqDto, userVo));
+    private Invoice invoiceCreation(InvoicePaymentReqDto invoicePaymentReqDto, UserVO userVo) {
+        Optional<Invoice> invoice = invoiceRepository.findByInvoiceNumberAndPaymentNumber(invoicePaymentReqDto.getInvoiceNumber(), invoicePaymentReqDto.getPaymentNumber());
+        Invoice savedinvoice = invoice.orElseGet(() -> makeNewInvoice(invoicePaymentReqDto, userVo));
 
         if (savedinvoice.getPaymentStatus().equals(PaymentStatus.PAID)) {
             throw new CodedException(ExceptionType.DuplicateResourceCodedException, "E4090001", "EINP40010001");
         }
 
         Optional<Payee> payee = payeeRepository.findByPayeeIdentifier(userVo.getUserMobileNo());
-        Payee savedPayee = payee.orElse(new Payee(userVo.getUserMobileNo()));
+        Payee savedPayee = payee.orElseGet(() -> new Payee(userVo.getUserMobileNo()));
         payeeRepository.saveAndFlush(savedPayee);
 
         Optional<PayRequest> payRequest = payRequestRepository.findByPayeeAndChannel(savedPayee, Channel.HAM_BAAM);
-        PayRequest savedPayReq = payRequest.orElse(new PayRequest(savedPayee, Channel.HAM_BAAM, null));
+        PayRequest savedPayReq = payRequest.orElseGet(() -> new PayRequest(savedPayee, Channel.HAM_BAAM, null));
         payRequestRepository.saveAndFlush(savedPayReq);
 
         Optional<PayRequestInvoice> payReqInvoice = payRequestInvoiceRepository.findByPayRequestIdAndInvoiceId(savedPayReq.getId(), savedinvoice.getId());
-        PayRequestInvoice savedPayReqInvoice = payReqInvoice.orElse(new PayRequestInvoice(savedPayReq, savedinvoice));
+        PayRequestInvoice savedPayReqInvoice = payReqInvoice.orElseGet(() -> new PayRequestInvoice(savedPayReq, savedinvoice));
         payRequestInvoiceRepository.saveAndFlush(savedPayReqInvoice);
 
         return savedinvoice;
     }
 
-    private Invoice makeNewInvoice(InvoicePaymantReqDto invoicePaymantReqDto, UserVO userVo) {
-        InvoiceType invoiceType = InvoiceType.getEnum(Integer.parseInt(invoicePaymantReqDto.getInvoiceNumber().substring(invoicePaymantReqDto.getInvoiceNumber().length() - 2, invoicePaymantReqDto.getInvoiceNumber().length() - 1)));
+    private Invoice makeNewInvoice(InvoicePaymentReqDto invoicePaymentReqDto, UserVO userVo) {
+        InvoiceType invoiceType = InvoiceType.getEnum(Integer.parseInt(invoicePaymentReqDto.getInvoiceNumber().substring(invoicePaymentReqDto.getInvoiceNumber().length() - 2, invoicePaymentReqDto.getInvoiceNumber().length() - 1)));
 
         Invoice savedInvoice = new Invoice();
-        savedInvoice.setInvoiceNumber(invoicePaymantReqDto.getInvoiceNumber());
-        savedInvoice.setPaymentNumber(invoicePaymantReqDto.getPaymentNumber());
+        savedInvoice.setInvoiceNumber(invoicePaymentReqDto.getInvoiceNumber());
+        savedInvoice.setPaymentNumber(invoicePaymentReqDto.getPaymentNumber());
         savedInvoice.setInvoiceType(invoiceType);
-        savedInvoice.setAmount(new BigDecimal(invoicePaymantReqDto.getAmount()));
+        savedInvoice.setAmount(new BigDecimal(invoicePaymentReqDto.getAmount()));
         savedInvoice.setServiceMethod(ServiceMethod.BY_CARD);
         savedInvoice.setPaymentStatus(PaymentStatus.INCONCLUSIVE);
         savedInvoice.setChannel(Channel.HAM_BAAM);

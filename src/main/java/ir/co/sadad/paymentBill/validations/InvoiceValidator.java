@@ -1,24 +1,25 @@
 package ir.co.sadad.paymentBill.validations;
 
-import ir.co.sadad.paymentBill.dtos.InvoicePaymantReqDto;
+import ir.co.sadad.paymentBill.dtos.InvoicePaymentReqDto;
 import ir.co.sadad.paymentBill.enums.ExceptionType;
+import ir.co.sadad.paymentBill.exceptions.BillPaymentException;
 import ir.co.sadad.paymentBill.exceptions.CodedException;
+import org.springframework.http.HttpStatus;
 
-import javax.annotation.Priority;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import java.math.BigDecimal;
 
-@Priority(10)
-public class InvoiceValidator implements ConstraintValidator<InvoiceValid, InvoicePaymantReqDto> {
+//@Priority(10)
+public class InvoiceValidator implements ConstraintValidator<InvoiceValid, InvoicePaymentReqDto> {
 
     @Override
-    public boolean isValid(InvoicePaymantReqDto invoicePaymantReqDto, ConstraintValidatorContext constraintValidatorContext) {
+    public boolean isValid(InvoicePaymentReqDto invoicePaymentReqDto, ConstraintValidatorContext constraintValidatorContext) {
 
-        if (invoicePaymantReqDto == null) {
+        if (invoicePaymentReqDto == null) {
             return false;
         }
-        checkInvoiceValidation(Long.toString(Long.parseLong(invoicePaymantReqDto.getInvoiceNumber())), Long.toString(Long.parseLong(invoicePaymantReqDto.getPaymentNumber())), new BigDecimal(invoicePaymantReqDto.getAmount()));
+        checkInvoiceValidation(Long.toString(Long.parseLong(invoicePaymentReqDto.getInvoiceNumber())), Long.toString(Long.parseLong(invoicePaymentReqDto.getPaymentNumber())), new BigDecimal(invoicePaymentReqDto.getAmount()));
         return true;
     }
 
@@ -32,7 +33,8 @@ public class InvoiceValidator implements ConstraintValidator<InvoiceValid, Invoi
         int mod = checkInvoiceId(invoiceIdSubstring);
 
         if (mod != Integer.parseInt(invoiceNumber.substring(invoiceNumber.length() - 1))) {
-            throw new CodedException(ExceptionType.IllegalArgumentCoddedException,"E4000001", "error.invoice_number_is_invalid");
+//            throw new CodedException(ExceptionType.IllegalArgumentCoddedException,"E4000001", "error.invoice_number_is_invalid");
+            throw new BillPaymentException("error.invoice.number.is.invalid" , HttpStatus.BAD_REQUEST);
         }
 
         int checkPaymentIdValueLastSecond = checkPaymentIdLastSecond(paymentIdSubstring);
