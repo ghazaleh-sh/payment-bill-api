@@ -33,8 +33,8 @@ public class PaymentBillApiApplicationTests {
 
 		userVO = UserVO.of(userId, cellphone, deviceId, ssn);
 
-		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-		validator = (InvoiceValidator) factory.getValidator();
+//		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+//		validator = (InvoiceValidator) factory.getValidator();
 
 	}
 

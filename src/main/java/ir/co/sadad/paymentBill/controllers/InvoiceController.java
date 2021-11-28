@@ -5,7 +5,6 @@ import ir.co.sadad.paymentBill.dtos.InvoicePaymentReqDto;
 import ir.co.sadad.paymentBill.dtos.InvoiceVerifyReqDto;
 import ir.co.sadad.paymentBill.dtos.ipg.FinalBillPaymentReqDto;
 import ir.co.sadad.paymentBill.dtos.ipg.FinalBillPaymentResDto;
-import ir.co.sadad.paymentBill.dtos.GeneralRegistrationResponse;
 import ir.co.sadad.paymentBill.services.InvoicePaymentService;
 import ir.co.sadad.paymentBill.validations.InvoiceValid;
 import ir.co.sadad.paymentBill.validations.VerifyValid;

@@ -5,6 +5,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * dto for response of psp after registration
+ *
+ * @author g.shahrokhabadi
+ */
 @Setter
 @Getter
 @JsonIgnoreProperties(ignoreUnknown = true)

@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * request and response dto of ipg for payment request Token
+ * request dto of ipg for payment request Token
  *
  * @author g.shahrokhabadi
  */

@@ -1,12 +1,12 @@
 package ir.co.sadad.paymentBill.services;
 
 import ir.co.sadad.paymentBill.PaymentBillApiApplicationTests;
-import ir.co.sadad.paymentBill.UserVO;
 import ir.co.sadad.paymentBill.dtos.InvoicePaymentReqDto;
 import ir.co.sadad.paymentBill.dtos.InvoiceVerifyReqDto;
 import ir.co.sadad.paymentBill.dtos.ipg.*;
 import ir.co.sadad.paymentBill.enums.IpgVerificationStatus;
 import ir.co.sadad.paymentBill.exceptions.BillPaymentException;
+import ir.co.sadad.paymentBill.exceptions.CodedException;
 import ir.co.sadad.paymentBill.services.basics.BasicWebClient;
 import ir.co.sadad.paymentBill.validations.InvoiceValidator;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
@@ -39,8 +39,7 @@ class InvoicePaymentServiceImplTest extends PaymentBillApiApplicationTests {
     private FinalBillPaymentReqDto finalBillPaymentReqDto;
 
 //    @Autowired
-//    private InvoiceValidator validator;
-
+    private InvoiceValidator validator;
 
 
     @Test
@@ -53,6 +52,17 @@ class InvoicePaymentServiceImplTest extends PaymentBillApiApplicationTests {
         boolean violations = validator.isValid(invoicePaymentReqDto , new ConstraintValidatorContextImpl(null,null,null,null,null,null));
 
         assertEquals(false, violations);
+
+    }
+
+    @Test
+    void shouldThrowExceptionForPaidRecordByBillPaymentByIpg(){
+        invoicePaymentReqDto = new InvoicePaymentReqDto();
+        invoicePaymentReqDto.setAmount("262000");
+        invoicePaymentReqDto.setInvoiceNumber("4337680730155");
+        invoicePaymentReqDto.setPaymentNumber("0000026206938");
+
+        assertThrows(CodedException.class, () -> service.BillPaymentByIpg(invoicePaymentReqDto, userVO, authToken));
 
     }
 

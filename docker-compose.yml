@@ -1,0 +1,32 @@
+version: '3.3'
+services:
+  payment-bill-api:
+    image: repo.sadad.co.ir/repository/baam-docker-registry/payment-bill-api:BUILD_NUMBER
+    container_name: payment-bill-api
+    hostname: psp-payment-gateway-srv
+    networks:
+      neo-baam:
+        aliases:
+          - payment-bill-api
+    ports:
+      - 9035:9080
+#      - 1697:1616
+#      - 9078:8000
+    #    volumes:
+    #      - /opt/configs/pichak-api:/opt/configs/pichak-api
+    tty: true
+    extra_hosts:
+      - "cache: 192.168.53.58"
+    #    - eb.bmi.ir: 192.168.52.93
+    volumes:
+      - /var/log/integration :/var/log/integration
+    environment:
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
+      - JVM_OPTS=-Dfile.encoding=UTF8
+#      - JAVA_OPTS="-Dspring.config.location=/opt/configs/ebp/"
+    working_dir: /
+    build: .
+    restart: always
+networks:
+  neo-baam:
+    driver: bridge

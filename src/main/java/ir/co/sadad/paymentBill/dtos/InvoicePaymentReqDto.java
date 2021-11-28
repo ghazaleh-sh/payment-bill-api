@@ -2,6 +2,11 @@ package ir.co.sadad.paymentBill.dtos;
 
 import javax.validation.constraints.NotBlank;
 
+/**
+ * dto for first request of payment- using by ipg and old registration
+ *
+ * @author g.shahrokhabadi
+ */
 public class InvoicePaymentReqDto {
 
     @NotBlank

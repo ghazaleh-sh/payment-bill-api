@@ -4,6 +4,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * dto for sending request to psp service- old version
+ *
+ * @author g.shahrokhabadi
+ */
 @Setter
 @Getter
 public class PspInvoiceVerifyReqDto {

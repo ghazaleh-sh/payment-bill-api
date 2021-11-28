@@ -173,7 +173,10 @@ public class InvoicePaymentServiceImpl implements InvoicePaymentService {
         //TODO: must be Validate before
         Optional<Invoice> singleResult = invoiceRepository.findByOrderId(Long.valueOf(finalBillPaymentReqDto.getRequestId()));
 
-        if (singleResult.isEmpty() || singleResult.get().getPaymentStatus().equals(PaymentStatus.PAID))
+        if (singleResult.isEmpty())
+            throw new BillPaymentException("bill.is.not.exist.by.order.id", HttpStatus.BAD_REQUEST);
+
+        if (singleResult.get().getPaymentStatus().equals(PaymentStatus.PAID))
             throw new BillPaymentException("bill.is.paid", HttpStatus.BAD_REQUEST);
 
         if (!finalBillPaymentReqDto.getUserId().equals(singleResult.get().getUserId()))

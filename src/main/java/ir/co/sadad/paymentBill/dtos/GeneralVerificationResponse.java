@@ -4,8 +4,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
-//import javax.json.bind.annotation.JsonbProperty;
 
+/**
+ * dto for response of psp after verification
+ *
+ * @author g.shahrokhabadi
+ */
 @Setter
 @Getter
 public class GeneralVerificationResponse {
