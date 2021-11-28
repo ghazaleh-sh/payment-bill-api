@@ -34,9 +34,9 @@ public class InvoiceController {
     }
 
     @PostMapping
-    public ResponseEntity<GeneralRegistrationResponse> create(@InvoiceValid @RequestBody InvoicePaymentReqDto invoicePaymentReqDto) {
+    public ResponseEntity<InvoiceVerifyReqDto> create(@InvoiceValid @RequestBody InvoicePaymentReqDto invoicePaymentReqDto) {
 
-        GeneralRegistrationResponse paymentResponseDto = invoicePaymentService.invoiceRegister(invoicePaymentReqDto);
+        InvoiceVerifyReqDto paymentResponseDto = invoicePaymentService.invoiceRegister(invoicePaymentReqDto);
         return new ResponseEntity<>(paymentResponseDto, HttpStatus.OK);
     }
 
@@ -63,7 +63,7 @@ public class InvoiceController {
 
     @PostMapping(value = "/ipg-bill-verify")
     public ResponseEntity<FinalBillPaymentResDto> finalBillPaymentByIpg(
-            @VerifyValid @RequestBody FinalBillPaymentReqDto finalBillPaymentReqDto) {
+            @RequestBody FinalBillPaymentReqDto finalBillPaymentReqDto) {
 
         FinalBillPaymentResDto finalIpgVerifyRes = invoicePaymentService.finalBillPaymentByIpg(finalBillPaymentReqDto);
 

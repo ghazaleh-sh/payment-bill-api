@@ -20,7 +20,7 @@ public class UserVO {
             throw new BillPaymentException("to.user.id.must.not.be.null", HttpStatus.BAD_REQUEST);
         }
         this.userId = userId;
-        this.userMobileNo = userMobileNo;
+        this.userMobileNo = userMobileNo.replaceFirst("98", "0");
         this.serialId = serialId;
         this.ssn = ssn;
     }

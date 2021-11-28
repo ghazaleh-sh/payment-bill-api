@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import ir.co.sadad.paymentBill.RequestParamVO;
 import ir.co.sadad.paymentBill.dtos.GeneralRegistrationResponse;
 import ir.co.sadad.paymentBill.dtos.GeneralVerificationResponse;
-import ir.co.sadad.paymentBill.exceptions.GlobalErrorResponse;
+import ir.co.sadad.paymentBill.exceptions.*;
 import ir.co.sadad.paymentBill.dtos.PspInvoiceRegistrationReqDto;
 import ir.co.sadad.paymentBill.dtos.ipg.IPGPaymentRequestReqDto;
 import ir.co.sadad.paymentBill.dtos.ipg.IPGPaymentRequestResDto;
@@ -13,9 +13,6 @@ import ir.co.sadad.paymentBill.dtos.ipg.IPGVerifyReqDto;
 import ir.co.sadad.paymentBill.dtos.ipg.IPGVerifyResDto;
 import ir.co.sadad.paymentBill.dtos.payment.*;
 import ir.co.sadad.paymentBill.enums.ExceptionType;
-import ir.co.sadad.paymentBill.exceptions.BillPaymentException;
-import ir.co.sadad.paymentBill.exceptions.CodedException;
-import ir.co.sadad.paymentBill.exceptions.ServiceUnavailableException;
 import ir.co.sadad.paymentBill.services.basics.BasicWebClient;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -25,6 +22,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpStatusCodeException;
 
+/**
+ * a service for making outer service calls to sadad.shaparak url
+ *
+ * @author g.shahrokhabadi
+ */
 @Slf4j
 @RequiredArgsConstructor
 @Service
@@ -55,16 +57,14 @@ public class SadadPspService {
                     sadadBaseUrl + "/TokenizedBillPaymentApi/BillRequest",
                     GeneralRegistrationResponse.class);
 
-//            if (generalRegistrationResponse.getResCode() == "0") {
-//                return generalRegistrationResponse;
-//            }
+            if (generalRegistrationResponse.getResCode().equals("0")) {
+                return generalRegistrationResponse;
+            }
 //            //TODO:replace 502 with correct value
 //            if (generalRegistrationResponse.getResCode() == "502") {
 //                throw new CodedException(ExceptionType.PaymentAPIConnectionException, "E5000001", "EINP50010003");
 //            }
 
-            if (generalRegistrationResponse != null)
-                return generalRegistrationResponse;
             else
                 throw new ServiceUnavailableException("payment.request.unavailable");
 //
@@ -74,6 +74,12 @@ public class SadadPspService {
 
     }
 
+    /**
+     * using for charge module of old project(JEE based) which not implemented in this project completely
+     *
+     * @param pspPaymentRegistrationRequest
+     * @return
+     */
     public GeneralRegistrationResponse registerPayment(PspPaymentRegistrationRegistrationRequest pspPaymentRegistrationRequest) {
         GeneralRegistrationResponse generalRegistrationResponse = registerPaymentWebClient.doCallService(
                 pspPaymentRegistrationRequest,
@@ -100,6 +106,13 @@ public class SadadPspService {
         return generalVerificationResponse;
     }
 
+    /**
+     * old method for verifying bill payment by psp
+     * @param token
+     * @param signData
+     * @param orderId
+     * @return
+     */
     public GeneralVerificationResponse verifyInvoiceByPsp(String token, String signData, String orderId) {
         RequestParamVO requestParamVo = RequestParamVO.of(token, signData ,orderId);
 
@@ -121,6 +134,12 @@ public class SadadPspService {
         return generalVerificationResponse;
     }
 
+    /**
+     * sends request for bill payment and gets psp token through ipg
+     * @param ipgPaymentRequestReqDto
+     * @param oauthToken
+     * @return
+     */
     @SneakyThrows
     public String requestPaymentByIpg(IPGPaymentRequestReqDto ipgPaymentRequestReqDto, String oauthToken) {
 
@@ -147,6 +166,11 @@ public class SadadPspService {
         }
     }
 
+    /**
+     * verifies bill payment through ipg
+     * @param ipgVerifyReqDto
+     * @return
+     */
     @SneakyThrows
     public GeneralVerificationResponse verifyBillPaymentByIpg(IPGVerifyReqDto ipgVerifyReqDto) {
         try {

@@ -10,7 +10,9 @@ import ir.co.sadad.paymentBill.dtos.ipg.IPGVerifyReqDto;
 import ir.co.sadad.paymentBill.dtos.GeneralRegistrationResponse;
 import ir.co.sadad.paymentBill.dtos.GeneralVerificationResponse;
 import ir.co.sadad.paymentBill.dtos.PspInvoiceRegistrationReqDto;
+import ir.co.sadad.paymentBill.dtos.payment.PaymentRegistration;
 import ir.co.sadad.paymentBill.dtos.payment.PaymentVerificationResponse;
+import ir.co.sadad.paymentBill.dtos.payment.PspPaymentRegistrationRegistrationRequest;
 import ir.co.sadad.paymentBill.entities.Invoice;
 import ir.co.sadad.paymentBill.entities.PayRequest;
 import ir.co.sadad.paymentBill.entities.PayRequestInvoice;
@@ -42,6 +44,11 @@ import java.util.ResourceBundle;
 
 import static ir.co.sadad.paymentBill.Constants.PAYMENT_BILL_SERVICE_TYPE;
 
+/**
+ * a service between rest controller and sadadPsp services. using to send the request to psp
+ *
+ * @author g.shahrokhabadi
+ */
 @Slf4j
 @RequiredArgsConstructor
 @Service
@@ -65,6 +72,33 @@ public class InvoicePaymentServiceImpl implements InvoicePaymentService {
 
 //    TokenDecoder tokenDecoder;
 
+    /**
+     * using for charge module of old project(JEE based) which not implemented in this project completely
+     *
+     * @param paymentRegistration
+     * @return
+     * @throws TokenGenerationException
+     */
+    public String getPaymentToken(PaymentRegistration paymentRegistration) throws TokenGenerationException {
+        PspPaymentRegistrationRegistrationRequest pspPaymentRegistrationRequest = preparePaymentRegsitrationRequest(paymentRegistration);
+        GeneralRegistrationResponse generalRegistrationResponse = sadadPspService.registerPayment(pspPaymentRegistrationRequest);
+        return processGetTokenResponse(generalRegistrationResponse);
+    }
+    public PaymentVerificationResponse verifyPaymentTransaction(String token, String orderId) {
+        if (token == null || token.isEmpty()) {
+            throw new CodedException(ExceptionType.IllegalArgumentCoddedException, "E400005", "EINP40010009");
+        }
+        String base64SignedData = encoder.prepareSignDataWithToken(token);
+        GeneralVerificationResponse generalVerificationResponse = sadadPspService.verifyPayment(token, base64SignedData, orderId);
+        return processVerifyResponse(generalVerificationResponse);
+    }
+
+    /** old method to verify the result of request payment
+     *
+     * @param token
+     * @param orderId
+     * @return
+     */
     @Override
     public Invoice verifyInvoicePayment(String token, String orderId) {
 
@@ -76,9 +110,14 @@ public class InvoicePaymentServiceImpl implements InvoicePaymentService {
         return processVerifyResponse(processVerifyResponse(generalVerificationResponse));
     }
 
+    /**
+     * old method to get token of psp and registers invoice details in tables(if not exist)
+     * @param invoicePaymentReqDto
+     * @return
+     */
     @SneakyThrows
     @Override
-    public GeneralRegistrationResponse invoiceRegister(InvoicePaymentReqDto invoicePaymentReqDto) {
+    public InvoiceVerifyReqDto invoiceRegister(InvoicePaymentReqDto invoicePaymentReqDto) {
 
         String userId = "158";
         String cellPhone ="09218301631";
@@ -91,16 +130,23 @@ public class InvoicePaymentServiceImpl implements InvoicePaymentService {
         String signData = encoder.prepareSignDataForRegistration(pspInvoiceRegistrationReqDto.getTerminalId(), String.valueOf(pspInvoiceRegistrationReqDto.getOrderId()), pspInvoiceRegistrationReqDto.getAmount());
         pspInvoiceRegistrationReqDto.setSignData(signData);
         GeneralRegistrationResponse generalRegistrationResponse = sadadPspService.registerInvoiceByPsp(pspInvoiceRegistrationReqDto);
-        return generalRegistrationResponse;
 
-//        String token = processGetTokenResponse(generalRegistrationResponse);
+        String token = processGetTokenResponse(generalRegistrationResponse);
 
-//        InvoiceVerifyReqDto verifyResponse = new InvoiceVerifyReqDto();
-//        verifyResponse.setOrderId(String.valueOf(savedinvoice.getOrderId()));
-//        verifyResponse.setToken(token);
-//        return verifyResponse;
+        InvoiceVerifyReqDto verifyResponse = new InvoiceVerifyReqDto();
+        verifyResponse.setOrderId(String.valueOf(savedinvoice.getOrderId()));
+        verifyResponse.setToken(token);
+        return verifyResponse;
     }
 
+    /**
+     * takes token of psp through ipg services
+     *
+     * @param invoicePaymentReqDto
+     * @param userVo
+     * @param authToken
+     * @return pspToken and orderId
+     */
     @Override
     public InvoiceVerifyReqDto BillPaymentByIpg(InvoicePaymentReqDto invoicePaymentReqDto, UserVO userVo, String authToken){
 
@@ -115,19 +161,29 @@ public class InvoicePaymentServiceImpl implements InvoicePaymentService {
 
     }
 
+
+    /**
+     * verifies the result of payment bill by ipg services
+     *
+     * @param finalBillPaymentReqDto
+     * @return
+     */
     @Override
     public FinalBillPaymentResDto finalBillPaymentByIpg(FinalBillPaymentReqDto finalBillPaymentReqDto){
         //TODO: must be Validate before
         Optional<Invoice> singleResult = invoiceRepository.findByOrderId(Long.valueOf(finalBillPaymentReqDto.getRequestId()));
 
-        if(!finalBillPaymentReqDto.getUserId().equals(singleResult.get().getUserId()))
+        if (singleResult.isEmpty() || singleResult.get().getPaymentStatus().equals(PaymentStatus.PAID))
+            throw new BillPaymentException("bill.is.paid", HttpStatus.BAD_REQUEST);
+
+        if (!finalBillPaymentReqDto.getUserId().equals(singleResult.get().getUserId()))
             throw new BillPaymentException("userId.is.not.the.same", HttpStatus.BAD_REQUEST);
 
         GeneralVerificationResponse generalVerificationResponse = sadadPspService.verifyBillPaymentByIpg(makeIpgVerifyRequest(finalBillPaymentReqDto));
 
         processVerifyResponse(processVerifyResponse(generalVerificationResponse));
 
-        FinalBillPaymentResDto  finalResponse = new FinalBillPaymentResDto();
+        FinalBillPaymentResDto finalResponse = new FinalBillPaymentResDto();
         finalResponse.setStatus(IpgVerificationStatus.SUCCESSFUL);
         return finalResponse;
     }
@@ -285,5 +341,18 @@ public class InvoicePaymentServiceImpl implements InvoicePaymentService {
             log.error(messages.toString());
             throw new TokenGenerationException(responseMessage, resCode);
         }
+    }
+
+    /**
+     *  using for charge module of old project(JEE based) which not implemented in this project completely
+     * @param paymentRegistration
+     * @return
+     */
+    public PspPaymentRegistrationRegistrationRequest preparePaymentRegsitrationRequest(PaymentRegistration paymentRegistration) {
+        String signData = encoder.prepareSignDataForRegistration(paymentRegistration.getTerminalId(), String.valueOf(paymentRegistration.getOrderId()), paymentRegistration.getAmount());
+        return new PspPaymentRegistrationRegistrationRequest.Builder()
+                .addAlreadyExistRegisteredPayment(paymentRegistration)
+                .signData(signData)
+                .build();
     }
 }

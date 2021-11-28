@@ -14,7 +14,7 @@ public interface InvoicePaymentService {
 
 //    String getToken(InvoiceRegistration invoiceRegistration);
 
-    GeneralRegistrationResponse invoiceRegister(InvoicePaymentReqDto invoicePaymentReqDto);
+    InvoiceVerifyReqDto invoiceRegister(InvoicePaymentReqDto invoicePaymentReqDto);
 
     InvoiceVerifyReqDto BillPaymentByIpg(InvoicePaymentReqDto invoicePaymentReqDto, UserVO userVo, String authToken);
 
