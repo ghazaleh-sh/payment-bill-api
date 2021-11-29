@@ -8,7 +8,7 @@ RUN apt-get update \
     && apt-get -yq  install net-tools \
     && apt-get install -y ca-certificates-java
 
-ADD target/psp-payment-gateway.war /usr/local/tomcat/webapps/
+ADD target/payment-bill-api.jar /usr/local/tomcat/webapps/
 RUN sed -i 's/port="8080"/port="9080"/' /usr/local/tomcat/conf/server.xml
 
 RUN echo "Env variable :  $JAVA_OPTS"

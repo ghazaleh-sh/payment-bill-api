@@ -3,14 +3,14 @@ services:
   payment-bill-api:
     image: repo.sadad.co.ir/repository/baam-docker-registry/payment-bill-api:BUILD_NUMBER
     container_name: payment-bill-api
-    hostname: psp-payment-gateway-srv
+    hostname: payment-bill-api
     networks:
       neo-baam:
         aliases:
           - payment-bill-api
     ports:
       - 9035:9080
-#      - 1697:1616
+      - 1697:1616
 #      - 9078:8000
     #    volumes:
     #      - /opt/configs/pichak-api:/opt/configs/pichak-api
