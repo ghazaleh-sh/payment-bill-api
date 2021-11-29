@@ -9,7 +9,7 @@ services:
         aliases:
           - payment-bill-api
     ports:
-      - 9035:9080
+      - 8517:9080
       - 1697:1616
 #      - 9078:8000
     #    volumes:
