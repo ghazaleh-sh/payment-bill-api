@@ -1,6 +1,6 @@
 
 server:
-  port: 9035
+  port: 8517
   servlet:
     context-path: /api/payment-bill
 
