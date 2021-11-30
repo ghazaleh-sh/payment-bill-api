@@ -31,8 +31,8 @@ VOLUME /tmp
 
 ENV TZ=Asia/Tehran
 
-RUN  mkdir -p /var/log/payment-bill-api-0
-RUN  chmod -R 777 /var/log/payment-bill-api-0
+RUN  mkdir -p /var/log/payment-bill-api
+RUN  chmod -R 777 /var/log/payment-bill-api
 
-COPY target/*.jar payment-bill-api-0.0.1-SNAPSHOT.jar
+COPY target/payment-bill-api-0.0.1-SNAPSHOT.jar /usr/local/tomcat/webapps/
 ENTRYPOINT ["java","-Xdebug","-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=9035","-jar","/payment-bill-api-0.0.1-SNAPSHOT.jar"]

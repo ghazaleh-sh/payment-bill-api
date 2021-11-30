@@ -20,7 +20,7 @@ services:
       - "cache: 192.168.53.58"
     #    - eb.bmi.ir: 192.168.52.93
     volumes:
-      - /var/log/integration :/var/log/integration
+      - /var/log/payment-bill-api :/var/log/payment-bill-api
     environment:
       - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
       - JVM_OPTS=-Dfile.encoding=UTF8
