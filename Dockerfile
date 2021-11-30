@@ -1,5 +1,5 @@
 FROM tomcat:latest
-FROM adoptopenjdk/openjdk11
+#FROM adoptopenjdk/openjdk11
 USER root
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update \
@@ -12,11 +12,13 @@ RUN apt-get update \
 COPY target/payment-bill-api-0.0.1-SNAPSHOT.jar /usr/local/tomcat/webapps/
 
 VOLUME /tmp
-#RUN sed -i 's/port="8080"/port="9080"/' /usr/local/tomcat/conf/server.xml
+RUN sed -i 's/port="8080"/port="9080"/' /usr/local/tomcat/conf/server.xml
+
+RUN echo "Env variable :  $JAVA_OPTS"
+ENV TZ=Asia/Tehran
+
 RUN  mkdir -p /var/log/payment-bill-api
 RUN  chmod -R 777 /var/log/payment-bill-api
-#RUN echo "Env variable :  $JAVA_OPTS"
-ENV TZ=Asia/Tehran
 #RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 #ENV JPDA_TRANSPORT="dt_socket"
 #ENV JPDA_ADDRESS="*:8000"
