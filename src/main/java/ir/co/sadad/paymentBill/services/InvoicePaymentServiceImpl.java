@@ -147,6 +147,7 @@ public class InvoicePaymentServiceImpl implements InvoicePaymentService {
      * @param authToken
      * @return pspToken and orderId
      */
+    @SneakyThrows
     @Override
     public InvoiceVerifyReqDto BillPaymentByIpg(InvoicePaymentReqDto invoicePaymentReqDto, UserVO userVo, String authToken){
 
@@ -218,7 +219,7 @@ public class InvoicePaymentServiceImpl implements InvoicePaymentService {
         Invoice savedinvoice = invoice.orElseGet(() -> makeNewInvoice(invoicePaymentReqDto, userVo));
 
         if (savedinvoice.getPaymentStatus().equals(PaymentStatus.PAID)) {
-            throw new CodedException(ExceptionType.DuplicateResourceCodedException, "E4090001", "EINP40010001");
+            throw new BillPaymentException("bill.is.paid", HttpStatus.BAD_REQUEST);
         }
 
         Optional<Payee> payee = payeeRepository.findByPayeeIdentifier(userVo.getUserMobileNo());
