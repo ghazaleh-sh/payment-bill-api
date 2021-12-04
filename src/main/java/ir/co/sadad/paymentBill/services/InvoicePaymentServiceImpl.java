@@ -1,15 +1,11 @@
 package ir.co.sadad.paymentBill.services;
 
 import ir.co.sadad.paymentBill.UserVO;
-import ir.co.sadad.paymentBill.dtos.InvoicePaymentReqDto;
-import ir.co.sadad.paymentBill.dtos.InvoiceVerifyReqDto;
+import ir.co.sadad.paymentBill.dtos.*;
 import ir.co.sadad.paymentBill.dtos.ipg.FinalBillPaymentReqDto;
 import ir.co.sadad.paymentBill.dtos.ipg.FinalBillPaymentResDto;
 import ir.co.sadad.paymentBill.dtos.ipg.IPGPaymentRequestReqDto;
 import ir.co.sadad.paymentBill.dtos.ipg.IPGVerifyReqDto;
-import ir.co.sadad.paymentBill.dtos.GeneralRegistrationResponse;
-import ir.co.sadad.paymentBill.dtos.GeneralVerificationResponse;
-import ir.co.sadad.paymentBill.dtos.PspInvoiceRegistrationReqDto;
 import ir.co.sadad.paymentBill.dtos.payment.PaymentRegistration;
 import ir.co.sadad.paymentBill.dtos.payment.PaymentVerificationResponse;
 import ir.co.sadad.paymentBill.dtos.payment.PspPaymentRegistrationRegistrationRequest;
@@ -192,6 +188,27 @@ public class InvoicePaymentServiceImpl implements InvoicePaymentService {
         return finalResponse;
     }
 
+    public BillInquiryResDto billInquiry(BillInquiryReqDto billInquiryReqDto){
+        Invoice invoice = invoiceRepository.findByInvoiceNumberAndPaymentNumber(billInquiryReqDto.getInvoiceNumber(), billInquiryReqDto.getPaymentNumber()).orElseThrow(
+                () -> new BillPaymentException("invoice.is.not.exist", HttpStatus.NOT_FOUND));
+
+        return BillInquiryResDto.builder()
+                .amount(invoice.getAmount())
+                .cardNo(invoice.getCardNo())
+                .channel(invoice.getChannel())
+                .deviceSerialId(invoice.getDeviceSerialId())
+                .invoiceNumber(invoice.getInvoiceNumber())
+                .invoiceType(invoice.getInvoiceType())
+                .orderId(invoice.getOrderId())
+                .paymentNumber(billInquiryReqDto.getPaymentNumber())
+                .paymentStatus(invoice.getPaymentStatus())
+                .serviceMethod(invoice.getServiceMethod())
+                .serviceProvider(invoice.getServiceProvider())
+                .userId(invoice.getUserId())
+                .build();
+
+    }
+
     private IPGPaymentRequestReqDto makeIpgPaymentRequest(Invoice savedinvoice, InvoicePaymentReqDto invoicePaymentReqDto, UserVO user){
         IPGPaymentRequestReqDto req = new IPGPaymentRequestReqDto();
         req.setAmount(Long.valueOf(invoicePaymentReqDto.getAmount()));
@@ -216,9 +233,9 @@ public class InvoicePaymentServiceImpl implements InvoicePaymentService {
 
     private Invoice invoiceCreation(InvoicePaymentReqDto invoicePaymentReqDto, UserVO userVo) {
         Optional<Invoice> invoice = invoiceRepository.findByInvoiceNumberAndPaymentNumber(invoicePaymentReqDto.getInvoiceNumber(), invoicePaymentReqDto.getPaymentNumber());
-        Invoice savedinvoice = invoice.orElseGet(() -> makeNewInvoice(invoicePaymentReqDto, userVo));
+        Invoice savedInvoice = invoice.orElseGet(() -> makeNewInvoice(invoicePaymentReqDto, userVo));
 
-        if (savedinvoice.getPaymentStatus().equals(PaymentStatus.PAID)) {
+        if (savedInvoice.getPaymentStatus().equals(PaymentStatus.PAID)) {
             throw new BillPaymentException("bill.is.paid", HttpStatus.BAD_REQUEST);
         }
 
@@ -230,11 +247,11 @@ public class InvoicePaymentServiceImpl implements InvoicePaymentService {
         PayRequest savedPayReq = payRequest.orElseGet(() -> new PayRequest(savedPayee, Channel.HAM_BAAM, null));
         payRequestRepository.saveAndFlush(savedPayReq);
 
-        Optional<PayRequestInvoice> payReqInvoice = payRequestInvoiceRepository.findByPayRequestIdAndInvoiceId(savedPayReq.getId(), savedinvoice.getId());
-        PayRequestInvoice savedPayReqInvoice = payReqInvoice.orElseGet(() -> new PayRequestInvoice(savedPayReq, savedinvoice));
+        Optional<PayRequestInvoice> payReqInvoice = payRequestInvoiceRepository.findByPayRequestIdAndInvoiceId(savedPayReq.getId(), savedInvoice.getId());
+        PayRequestInvoice savedPayReqInvoice = payReqInvoice.orElseGet(() -> new PayRequestInvoice(savedPayReq, savedInvoice));
         payRequestInvoiceRepository.saveAndFlush(savedPayReqInvoice);
 
-        return savedinvoice;
+        return savedInvoice;
     }
 
     private Invoice makeNewInvoice(InvoicePaymentReqDto invoicePaymentReqDto, UserVO userVo) {
@@ -259,7 +276,7 @@ public class InvoicePaymentServiceImpl implements InvoicePaymentService {
 
     private PspInvoiceRegistrationReqDto prepareInvoiceRegistration(Invoice invoice) {
 
-        return new PspInvoiceRegistrationReqDto.Builder().terminalId(this.terminalId)
+        return PspInvoiceRegistrationReqDto.builder().terminalId(this.terminalId)
                 .merchantId(this.merchantId)
                 .amount(String.valueOf(invoice.getAmount().intValue()))
                 .invoiceNumber(invoice.getInvoiceNumber())

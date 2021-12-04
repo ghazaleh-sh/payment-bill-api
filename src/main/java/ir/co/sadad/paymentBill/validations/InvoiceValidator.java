@@ -24,6 +24,8 @@ public class InvoiceValidator implements ConstraintValidator<InvoiceValid, Invoi
     }
 
     public void checkInvoiceValidation(String invoiceNumber, String paymentNumber, BigDecimal amount) {
+        if(invoiceNumber.equals("") || paymentNumber.equals(""))
+            throw new BillPaymentException("method.argument.not.valid" , HttpStatus.BAD_REQUEST);
 
         String tempInvoiceId = "0000000000000" + invoiceNumber;
         String invoiceIdSubstring = tempInvoiceId.substring(tempInvoiceId.length() - 13);

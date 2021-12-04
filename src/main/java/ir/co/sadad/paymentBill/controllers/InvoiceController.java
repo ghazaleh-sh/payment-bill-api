@@ -1,6 +1,8 @@
 package ir.co.sadad.paymentBill.controllers;
 
 import ir.co.sadad.paymentBill.UserVO;
+import ir.co.sadad.paymentBill.dtos.BillInquiryReqDto;
+import ir.co.sadad.paymentBill.dtos.BillInquiryResDto;
 import ir.co.sadad.paymentBill.dtos.InvoicePaymentReqDto;
 import ir.co.sadad.paymentBill.dtos.InvoiceVerifyReqDto;
 import ir.co.sadad.paymentBill.dtos.ipg.FinalBillPaymentReqDto;
@@ -15,6 +17,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 import static ir.co.sadad.paymentBill.Constants.*;
 
@@ -62,11 +66,19 @@ public class InvoiceController {
 
     @PostMapping(value = "/ipg-bill-verify")
     public ResponseEntity<FinalBillPaymentResDto> finalBillPaymentByIpg(
+            @RequestHeader(name = HttpHeaders.AUTHORIZATION) String token,
             @RequestBody FinalBillPaymentReqDto finalBillPaymentReqDto) {
 
         FinalBillPaymentResDto finalIpgVerifyRes = invoicePaymentService.finalBillPaymentByIpg(finalBillPaymentReqDto);
 
         return new ResponseEntity<>(finalIpgVerifyRes, HttpStatus.OK);
 
+    }
+
+//    @Operation(summary = "سرویس استعلام قبض", description = "سرویسی که با دریافت شناسه درخواست موارد آنرا استعلام میکند")
+//    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = InquiryResponseDto.class)))
+    @GetMapping(value = "/bill-inquiry")
+    public ResponseEntity<BillInquiryResDto> inquiry(@Valid @RequestBody BillInquiryReqDto billInquiryReqDto) {
+        return new ResponseEntity<>(invoicePaymentService.billInquiry(billInquiryReqDto), HttpStatus.OK);
     }
 }
