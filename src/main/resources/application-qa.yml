@@ -26,7 +26,7 @@ spring:
 #https://sadad.shaparak.ir/api/v0
 sadad:
   psp:
-    base-url: https://sadad.shaparak.ir/api/v0
+    base-url: http://185.203.161.9:8099/api/v0
     payment:
       init-address: /Request/PaymentRequest
       verify-address: /Advice/Verify
