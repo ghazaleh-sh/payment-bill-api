@@ -1,12 +1,14 @@
 package ir.co.sadad.paymentBill.services.basics;
 
 import ir.co.sadad.paymentBill.RequestParamVO;
+import ir.co.sadad.paymentBill.exceptions.BillPaymentException;
+import ir.co.sadad.paymentBill.exceptions.GlobalErrorResponse;
 import ir.co.sadad.paymentBill.exceptions.ServiceUnavailableException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -81,15 +83,15 @@ public class BasicWebClient<T, K> {
             K response = webClient
                     .post()
                     .uri(urlQueryString)
-//                    .headers(h -> h.setBearerAuth(headerToken.substring(6)))
                     .header(HttpHeaders.AUTHORIZATION, headerToken)
                     .body(Mono.just(body), new ParameterizedTypeReference<T>() {
                     })
                     .retrieve()
+                    .onStatus(HttpStatus::isError, res -> res.bodyToMono(GlobalErrorResponse.class)
+                            .onErrorResume(e -> Mono.error(new BillPaymentException("aaaa", HttpStatus.INTERNAL_SERVER_ERROR)))
+                            .flatMap(errorBody -> Mono.error(new BillPaymentException(errorBody.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR)))
+                    )
                     .bodyToMono(responseType)
-                    .onErrorMap(e -> {
-                        return new ServiceUnavailableException("service.unavailable");
-                    })
                     .block();
 
             log.info("response of external service >>>>>>>>>>>>>>>>>> ", response);

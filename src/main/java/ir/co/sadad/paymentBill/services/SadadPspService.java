@@ -66,9 +66,9 @@ public class SadadPspService {
 //            }
 
             else
-                throw new ServiceUnavailableException("payment.request.unavailable");
-//
-        } catch (Exception e) {
+                throw new BillPaymentException(generalRegistrationResponse.getDescription(), Integer.valueOf(generalRegistrationResponse.getResCode()), HttpStatus.BAD_REQUEST);
+
+        } catch (ServiceUnavailableException e) {
 //            throw new CodedException(ExceptionType.PaymentAPIConnectionException, "E5000002", "EINP50010003");
             throw new ServiceUnavailableException("payment.request.unavailable");
         }

@@ -122,12 +122,19 @@ public class AppErrorAdvice {
 
         log.warn("service unavailable exception", ex);
 
+        String localizedMessage;
+        try {
+            localizedMessage = messageSource.getMessage(ex.getMessage(), null, new Locale("fa"));
+        } catch (NoSuchMessageException e) {
+            localizedMessage = ex.getMessage();
+        }
+
         GlobalErrorResponse globalErrorResponse = new GlobalErrorResponse();
         globalErrorResponse
                 .setStatus(HttpStatus.SERVICE_UNAVAILABLE)
                 .setTimestamp(new Date().getTime())
                 .setCode("E" + HttpStatus.SERVICE_UNAVAILABLE.value() + ERROR_CODE_TAIL)
-                .setLocalizedMessage(messageSource.getMessage(ex.getMessage(), null, new Locale("fa")));
+                .setLocalizedMessage(localizedMessage);
 
         return new ResponseEntity<>(globalErrorResponse, HttpStatus.SERVICE_UNAVAILABLE);
 
