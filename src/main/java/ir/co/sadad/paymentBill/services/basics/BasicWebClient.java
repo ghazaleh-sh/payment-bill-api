@@ -27,13 +27,13 @@ public class BasicWebClient<T, K> {
             K response = webClient
                     .post()
                     .uri(urlQueryString)
-                    .body(Mono.just(body), new ParameterizedTypeReference<T>() {
+                    .body(Mono.just(body), new ParameterizedTypeReference<>() {
                     })
                     .retrieve()
+                    .onStatus(HttpStatus::isError, clientResponse -> clientResponse.bodyToMono(GlobalErrorResponse.class)
+                            .flatMap(errorBody -> Mono.error(new BillPaymentException(errorBody, errorBody.getStatus())))
+                    )
                     .bodyToMono(responseType)
-                    .onErrorMap(e -> {
-                        return new ServiceUnavailableException("service.unavailable");
-                    })
                     .block();
 
             log.info("response of external service >>>>>>>>>>>>>>>>>> ", response);
@@ -62,7 +62,7 @@ public class BasicWebClient<T, K> {
                     .retrieve()
                     .bodyToMono(responseType)
                     .onErrorMap(e -> {
-                        return new ServiceUnavailableException("service.unavailable");
+                        throw new ServiceUnavailableException("service.unavailable");
                     })
                     .block();
 
@@ -84,12 +84,12 @@ public class BasicWebClient<T, K> {
                     .post()
                     .uri(urlQueryString)
                     .header(HttpHeaders.AUTHORIZATION, headerToken)
-                    .body(Mono.just(body), new ParameterizedTypeReference<T>() {
+                    .body(Mono.just(body), new ParameterizedTypeReference<>() {
                     })
                     .retrieve()
-                    .onStatus(HttpStatus::isError, res -> res.bodyToMono(GlobalErrorResponse.class)
-                            .onErrorResume(e -> Mono.error(new BillPaymentException("aaaa", HttpStatus.INTERNAL_SERVER_ERROR)))
-                            .flatMap(errorBody -> Mono.error(new BillPaymentException(errorBody.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR)))
+                    .onStatus(HttpStatus::isError, clientResponse -> clientResponse.bodyToMono(GlobalErrorResponse.class)
+//                            .onErrorResume(e -> Mono.error(new BillPaymentException(e.getMessage(), clientResponse.statusCode())))
+                              .flatMap(errorBody -> Mono.error(new BillPaymentException(errorBody, errorBody.getStatus())))
                     )
                     .bodyToMono(responseType)
                     .block();

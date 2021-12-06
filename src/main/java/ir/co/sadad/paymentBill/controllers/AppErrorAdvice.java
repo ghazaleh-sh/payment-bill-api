@@ -54,6 +54,9 @@ public class AppErrorAdvice {
 
         log.warn("Core Service Exception: ", ex);
 
+        if (ex.getGlobalErrorResponse() != null)
+            return new ResponseEntity<>(ex.getGlobalErrorResponse(), ex.getHttpStatus());
+
         String localizedMessage;
         try {
             localizedMessage = messageSource.getMessage(ex.getMessage(), null, new Locale("fa"));

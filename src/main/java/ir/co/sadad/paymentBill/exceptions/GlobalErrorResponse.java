@@ -1,5 +1,6 @@
 package ir.co.sadad.paymentBill.exceptions;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -15,6 +16,7 @@ import java.util.List;
 @Setter
 @Accessors(chain = true)
 @ToString
+@JsonIgnoreProperties(ignoreUnknown=true)
 public class GlobalErrorResponse {
 
     private HttpStatus status;
@@ -23,6 +25,7 @@ public class GlobalErrorResponse {
     private String message;
     private String localizedMessage;
     private List<SubError> subErrors = new ArrayList<>();
+    private String extraData;
 
     @Getter
     @Setter

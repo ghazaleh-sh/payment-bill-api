@@ -60,7 +60,7 @@ public class SadadPspService {
             if (generalRegistrationResponse.getResCode().equals("0")) {
                 return generalRegistrationResponse;
             }
-//            //TODO:replace 502 with correct value
+
 //            if (generalRegistrationResponse.getResCode() == "502") {
 //                throw new CodedException(ExceptionType.PaymentAPIConnectionException, "E5000001", "EINP50010003");
 //            }
@@ -109,7 +109,7 @@ public class SadadPspService {
 
     /**
      * old method for verifying bill payment by psp
-     * @param token
+     * @param token is psp token recieived by BillRequest call
      * @param signData
      * @param orderId
      * @return
@@ -169,7 +169,7 @@ public class SadadPspService {
 
     /**
      * verifies bill payment through ipg
-     * @param ipgVerifyReqDto
+     * @param ipgVerifyReqDto Dto for sending request to verify payment
      * @return
      */
     @SneakyThrows
