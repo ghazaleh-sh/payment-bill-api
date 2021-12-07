@@ -61,3 +61,7 @@ invoice:
 #  tokenServerURL=http://sso:9080/identity/oauth2/auth/token
 #  authorizationPrefix=Basic a2V5OnNlY3JldA==
 #  scope=device-session-verification
+
+springdoc:
+  swagger-ui:
+    path: /api.html

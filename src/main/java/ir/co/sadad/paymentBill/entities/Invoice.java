@@ -10,6 +10,7 @@ import org.joda.time.DateTime;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.Collection;
@@ -27,7 +28,7 @@ import java.util.Collection;
 //                query = "SELECT invc FROM Invoice invc WHERE invc.orderId = :orderId")
 //})
 @IdClass(InvoicePk.class)
-public class Invoice {
+public class Invoice implements Serializable {
 //    public static final String NAMED_QUERY_FIND_BY_INVOCICENUMBER_PAYMENTNUMBER = "InvoiceService.findByInvoiceNumberAndPaymentNumber";
 //    public static final String NAMED_QUERY_FIND_BY_ID = "InvoiceService.findById";
 //    public static final String NAMED_QUERY_FIND_BY_ORDER_ID = "InvoiceService.findByOrderId";

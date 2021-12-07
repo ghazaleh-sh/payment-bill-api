@@ -1,5 +1,7 @@
 package ir.co.sadad.paymentBill.controllers;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import ir.co.sadad.paymentBill.UserVO;
 import ir.co.sadad.paymentBill.dtos.BillInquiryReqDto;
 import ir.co.sadad.paymentBill.dtos.BillInquiryResDto;
@@ -27,6 +29,7 @@ import static ir.co.sadad.paymentBill.Constants.*;
 @RestController
 @Validated
 @RequestMapping(value = "invoice")
+@Tag(description = "کنترلر های سرویس پرداخت قبض", name = "Invoice controller")
 public class InvoiceController {
 
     private final InvoicePaymentService invoicePaymentService;
@@ -49,6 +52,7 @@ public class InvoiceController {
         return new ResponseEntity(HttpStatus.OK);
     }
 
+    @Operation(summary = "سرویس درخواست توکن از پی اس پی", description = "سرویسی که با ارسال مشخصات قبض، توکن پی اس پی را از طریق ipg دریافت میکند")
     @PostMapping(value = "/ipg-bill-payment")
     public ResponseEntity<InvoiceVerifyReqDto> billPaymentByIpg(
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) String authToken,
@@ -64,6 +68,7 @@ public class InvoiceController {
 
     }
 
+    @Operation(summary = "سرویس تایید پرداخت پی اس پی", description = "سرویسی که جهت تایید پرداخت توسط پی اس پی از طریق درگاه ipg کال میشود.")
     @PostMapping(value = "/ipg-bill-verify")
     public ResponseEntity<FinalBillPaymentResDto> finalBillPaymentByIpg(
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) String token,
@@ -75,8 +80,7 @@ public class InvoiceController {
 
     }
 
-//    @Operation(summary = "سرویس استعلام قبض", description = "سرویسی که با دریافت شناسه درخواست موارد آنرا استعلام میکند")
-//    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = InquiryResponseDto.class)))
+    @Operation(summary = "سرویس استعلام قبض", description = "سرویسی که با دریافت شناسه قبض و شناسه پرداخت موارد آنرا استعلام میکند")
     @GetMapping(value = "/bill-inquiry")
     public ResponseEntity<BillInquiryResDto> inquiry(@Valid @RequestBody BillInquiryReqDto billInquiryReqDto) {
         return new ResponseEntity<>(invoicePaymentService.billInquiry(billInquiryReqDto), HttpStatus.OK);

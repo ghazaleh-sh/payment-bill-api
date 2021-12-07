@@ -6,6 +6,7 @@ import org.joda.time.DateTime;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.sql.Timestamp;
 
 @Getter
@@ -16,7 +17,7 @@ import java.sql.Timestamp;
 //        @NamedQuery(name = Payee.NAMED_QUERY_FIND_BY_PAYEEIDENTIFIER,
 //                query = "SELECT p FROM Payee p WHERE p.payeeIdentifier = :payeeIdentifier")
 //})
-public class Payee {
+public class Payee implements Serializable {
 //    public static final String NAMED_QUERY_FIND_BY_PAYEEIDENTIFIER = "Payee.findByPayeeIdentifier";
 
     public Payee() {

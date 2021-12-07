@@ -15,14 +15,14 @@
 	<description>paying the bills project</description>
 
 	<properties>
-		<java.version>11</java.version>
+<!--		<java.version>11</java.version>-->
 		<org.mapstruct.version>1.4.1.Final</org.mapstruct.version>
 		<org.apache.common.version>3.11</org.apache.common.version>
 		<querydsl-core.version>4.4.0</querydsl-core.version>
 		<open.api.version>1.4.8</open.api.version>
-		<javax.servlet.version>1.2</javax.servlet.version>
+<!--		<javax.servlet.version>1.2</javax.servlet.version>-->
 		<spring-cloud.version>2020.0.3</spring-cloud.version>
-		<hazelcast.version>3.11.4</hazelcast.version>
+<!--		<hazelcast.version>3.11.4</hazelcast.version>-->
 	</properties>
 
 <!--	<profiles>-->
@@ -154,6 +154,7 @@
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-config</artifactId>
 		</dependency>
+		<!--important! used for staring the application -->
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-bootstrap</artifactId>
@@ -352,28 +353,69 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<excludes>
+						<exclude>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+						</exclude>
+					</excludes>
+				</configuration>
+				<executions>
+					<execution>
+						<id>repackage</id>
+						<goals>
+							<goal>repackage</goal>
+						</goals>
+						<configuration>
+							<skip>true</skip>
+						</configuration>
+					</execution>
+					<execution>
+						<id>build-info</id>
+						<goals>
+							<goal>build-info</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>pre-integration-test</id>
+						<goals>
+							<goal>start</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>post-integration-test</id>
+						<goals>
+							<goal>stop</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.8.1</version>
 				<configuration>
-					<source>${java.version}</source>
-					<target>${java.version}</target>
-					<annotationProcessorPaths>
-						<path>
-							<groupId>org.projectlombok</groupId>
-							<artifactId>lombok</artifactId>
-							<version>1.18.16</version>
-						</path>
-						<path>
-							<groupId>org.mapstruct</groupId>
-							<artifactId>mapstruct-processor</artifactId>
-							<version>${org.mapstruct.version}</version>
-						</path>
-						<!-- other annotation processors -->
-					</annotationProcessorPaths>
+					<source>11</source>
+					<target>11</target>
 				</configuration>
+				<!--				<configuration>-->
+<!--					<source>${java.version}</source>-->
+<!--					<target>${java.version}</target>-->
+<!--					<annotationProcessorPaths>-->
+<!--						<path>-->
+<!--							<groupId>org.projectlombok</groupId>-->
+<!--							<artifactId>lombok</artifactId>-->
+<!--							<version>1.18.16</version>-->
+<!--						</path>-->
+<!--						<path>-->
+<!--							<groupId>org.mapstruct</groupId>-->
+<!--							<artifactId>mapstruct-processor</artifactId>-->
+<!--							<version>${org.mapstruct.version}</version>-->
+<!--						</path>-->
+<!--						&lt;!&ndash; other annotation processors &ndash;&gt;-->
+<!--					</annotationProcessorPaths>-->
+<!--				</configuration>-->
 			</plugin>
 			<!-- Query DSL -->
 			<plugin>
@@ -400,7 +442,71 @@
 					</dependency>
 				</dependencies>
 			</plugin>
+			<!--Config unit Test and Integration Tests -->
+<!--			<plugin>-->
+<!--				<groupId>org.apache.maven.plugins</groupId>-->
+<!--				<artifactId>maven-surefire-plugin</artifactId>-->
+<!--				<configuration>-->
+<!--					<forkCount>3</forkCount>-->
+<!--					<reuseForks>true</reuseForks>-->
+<!--					<testFailureIgnore>false</testFailureIgnore>-->
+<!--					<excludes>-->
+<!--						<exclude>**/it/**</exclude>-->
+<!--					</excludes>-->
+<!--				</configuration>-->
+<!--				<executions>-->
+<!--					<execution>-->
+<!--						<id>integration-test</id>-->
+<!--						<goals>-->
+<!--							<goal>test</goal>-->
+<!--						</goals>-->
+<!--						<phase>integration-test</phase>-->
+<!--						<configuration>-->
+<!--							<excludes>-->
+<!--								<exclude>none</exclude>-->
+<!--							</excludes>-->
+<!--							<includes>-->
+<!--								<include>**/*IT.java</include>-->
+<!--								<include>**/*AT.java</include>-->
+<!--							</includes>-->
+<!--						</configuration>-->
+<!--					</execution>-->
+<!--				</executions>-->
+<!--			</plugin>-->
+<!--			&lt;!&ndash; Plugin to separate integration tests &ndash;&gt;-->
+<!--			<plugin>-->
+<!--				<groupId>org.codehaus.mojo</groupId>-->
+<!--				<artifactId>build-helper-maven-plugin</artifactId>-->
+<!--				<version>3.2.0</version>-->
+<!--				<executions>-->
+<!--					<execution>-->
+<!--						<id>add-test-source</id>-->
+<!--						<phase>process-resources</phase>-->
+<!--						<goals>-->
+<!--							<goal>add-test-source</goal>-->
+<!--						</goals>-->
+<!--						<configuration>-->
+<!--							<sources>-->
+<!--								<source>src/it/java</source>-->
+<!--							</sources>-->
+<!--						</configuration>-->
+<!--					</execution>-->
+<!--					<execution>-->
+<!--						<id>add-integration-test-resources</id>-->
+<!--						<phase>generate-test-resources</phase>-->
+<!--						<goals>-->
+<!--							<goal>add-test-resource</goal>-->
+<!--						</goals>-->
+<!--						<configuration>-->
+<!--							<resources>-->
+<!--								<resource>-->
+<!--									<directory>src/it/resources</directory>-->
+<!--								</resource>-->
+<!--							</resources>-->
+<!--						</configuration>-->
+<!--					</execution>-->
+<!--				</executions>-->
+<!--			</plugin>-->
 		</plugins>
 	</build>
-
 </project>

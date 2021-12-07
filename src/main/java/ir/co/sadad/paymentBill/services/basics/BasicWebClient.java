@@ -27,7 +27,7 @@ public class BasicWebClient<T, K> {
             K response = webClient
                     .post()
                     .uri(urlQueryString)
-                    .body(Mono.just(body), new ParameterizedTypeReference<>() {
+                    .body(Mono.just(body), new ParameterizedTypeReference<T>() {
                     })
                     .retrieve()
                     .onStatus(HttpStatus::isError, clientResponse -> clientResponse.bodyToMono(GlobalErrorResponse.class)
@@ -84,7 +84,7 @@ public class BasicWebClient<T, K> {
                     .post()
                     .uri(urlQueryString)
                     .header(HttpHeaders.AUTHORIZATION, headerToken)
-                    .body(Mono.just(body), new ParameterizedTypeReference<>() {
+                    .body(Mono.just(body), new ParameterizedTypeReference<T>() {
                     })
                     .retrieve()
                     .onStatus(HttpStatus::isError, clientResponse -> clientResponse.bodyToMono(GlobalErrorResponse.class)
