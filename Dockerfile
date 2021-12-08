@@ -27,6 +27,10 @@
 # clean package -P test -DskipTests=true
 FROM adoptopenjdk/openjdk11
 
+COPY src/main/resources/mypsp.cer /usr/lib/jvm/java-1.8-openjdk/jre/lib/security/
+RUN cd /usr/lib/jvm/java-1.8-openjdk/jre/lib/security \
+    && keytool -keystore cacerts -storepass changeit -noprompt -trustcacerts -importcert -alias mypsp -file mypsp.cer
+
 VOLUME /tmp
 
 ENV TZ=Asia/Tehran
