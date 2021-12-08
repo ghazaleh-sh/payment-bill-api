@@ -13,10 +13,12 @@ import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintVa
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.ConstraintViolation;
+import java.math.BigDecimal;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -39,9 +41,9 @@ class InvoicePaymentServiceImplTest extends PaymentBillApiApplicationTests {
     private FinalBillPaymentReqDto finalBillPaymentReqDto;
 
 //    @Autowired
-    private InvoiceValidator validator;
+    private InvoiceValidator validator = new InvoiceValidator();
 
-
+/////////////////////////// billPaymentByIpg method /////////////////////////////
     @Test
     void shouldReturnValidationErrorByBillPaymentByIpg(){
         invoicePaymentReqDto = new InvoicePaymentReqDto();
@@ -49,9 +51,9 @@ class InvoicePaymentServiceImplTest extends PaymentBillApiApplicationTests {
         invoicePaymentReqDto.setInvoiceNumber("433768073015511");
         invoicePaymentReqDto.setPaymentNumber("26206938");
 
-        boolean violations = validator.isValid(invoicePaymentReqDto , new ConstraintValidatorContextImpl(null,null,null,null,null,null));
+//        boolean violations = validator.isValid(invoicePaymentReqDto , new ConstraintValidatorContextImpl(null,null,null,null,null,null));
 
-        assertEquals(false, violations);
+//        assertThrows(BillPaymentException.class, validator.checkInvoiceValidation(invoicePaymentReqDto.getInvoiceNumber() , invoicePaymentReqDto.getPaymentNumber(), new BigDecimal(invoicePaymentReqDto.getAmount())));
 
     }
 
@@ -86,6 +88,8 @@ class InvoicePaymentServiceImplTest extends PaymentBillApiApplicationTests {
 
     }
 
+
+    /////////////////////////// finalBillPaymentByIpg method /////////////////////////////
     @Test
     void shouldThrowUserIdExceptionByFinalBillPaymentByIpg() {
         finalBillPaymentReqDto = new FinalBillPaymentReqDto();

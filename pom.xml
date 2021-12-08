@@ -22,7 +22,7 @@
 		<open.api.version>1.4.8</open.api.version>
 <!--		<javax.servlet.version>1.2</javax.servlet.version>-->
 		<spring-cloud.version>2020.0.3</spring-cloud.version>
-<!--		<hazelcast.version>3.11.4</hazelcast.version>-->
+		<hazelcast.version>3.11.4</hazelcast.version>
 	</properties>
 
 <!--	<profiles>-->
@@ -237,11 +237,13 @@
 			<version>2.4.0</version>
 		</dependency>
 		<!--############################ SSO ############################-->
-<!--		<dependency>-->
-<!--			<groupId>ir.bmi.identity</groupId>-->
-<!--			<artifactId>client-security-starter-v2</artifactId>-->
-<!--			<version>1.2.1</version>-->
-<!--		</dependency>-->
+		<dependency>
+			<groupId>ir.bmi.identity</groupId>
+			<artifactId>client-security-starter-v2</artifactId>
+			<version>1.2.1</version>
+		</dependency>
+
+
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
@@ -377,18 +379,18 @@
 							<goal>build-info</goal>
 						</goals>
 					</execution>
-					<execution>
-						<id>pre-integration-test</id>
-						<goals>
-							<goal>start</goal>
-						</goals>
-					</execution>
-					<execution>
-						<id>post-integration-test</id>
-						<goals>
-							<goal>stop</goal>
-						</goals>
-					</execution>
+<!--					<execution>-->
+<!--						<id>pre-integration-test</id>-->
+<!--						<goals>-->
+<!--							<goal>start</goal>-->
+<!--						</goals>-->
+<!--					</execution>-->
+<!--					<execution>-->
+<!--						<id>post-integration-test</id>-->
+<!--						<goals>-->
+<!--							<goal>stop</goal>-->
+<!--						</goals>-->
+<!--					</execution>-->
 				</executions>
 			</plugin>
 			<plugin>

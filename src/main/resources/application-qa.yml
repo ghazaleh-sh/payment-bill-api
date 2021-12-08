@@ -65,3 +65,21 @@ invoice:
 springdoc:
   swagger-ui:
     path: /api.html
+
+###############################__SSO
+bmi.oauth2.excluded-urls:
+  /invoice/swagger-ui/**:*,
+  /swagger-ui/**:*,
+  /api/payment-bill/api.html:*,
+  /api.html:*,
+  /v3/**:*,
+  /h2/**:*,
+  /swagger-ui.html:*,
+  /webjars/**:*,
+  /v2/**:*,
+  /swagger-resources/**:*,
+  /invoice:PUT,
+  /invoice/id:GET,
+  /invoice/oldRegister:*,
+  /invoice/ipg-bill-payment:*,
+  /invoice/bill-inquiry:*

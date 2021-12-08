@@ -2,6 +2,7 @@ package ir.co.sadad.paymentBill.controllers;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import ir.bmi.identity.security.interceptor.Scope;
 import ir.co.sadad.paymentBill.UserVO;
 import ir.co.sadad.paymentBill.dtos.BillInquiryReqDto;
 import ir.co.sadad.paymentBill.dtos.BillInquiryResDto;
@@ -39,7 +40,7 @@ public class InvoiceController {
         return new ResponseEntity(HttpStatus.OK);
     }
 
-    @PostMapping
+    @PostMapping(value = "/oldRegister")
     public ResponseEntity<InvoiceVerifyReqDto> create(@InvoiceValid @RequestBody InvoicePaymentReqDto invoicePaymentReqDto) {
 
         InvoiceVerifyReqDto paymentResponseDto = invoicePaymentService.invoiceRegister(invoicePaymentReqDto);
@@ -68,6 +69,7 @@ public class InvoiceController {
 
     }
 
+    @Scope(values = "ipg-payment-verfiy")
     @Operation(summary = "سرویس تایید پرداخت پی اس پی", description = "سرویسی که جهت تایید پرداخت توسط پی اس پی از طریق درگاه ipg کال میشود.")
     @PostMapping(value = "/ipg-bill-verify")
     public ResponseEntity<FinalBillPaymentResDto> finalBillPaymentByIpg(
