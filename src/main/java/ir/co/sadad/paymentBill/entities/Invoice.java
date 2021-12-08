@@ -19,23 +19,11 @@ import java.util.Collection;
 @Setter
 @Entity
 @Table(name = "INVOICE")
-//@NamedQueries({
-//        @NamedQuery(name = Invoice.NAMED_QUERY_FIND_BY_INVOCICENUMBER_PAYMENTNUMBER,
-//                query = "SELECT invc FROM Invoice invc WHERE invc.invoiceNumber = :invoiceNumber and invc.paymentNumber = :paymentNumber"),
-//        @NamedQuery(name = Invoice.NAMED_QUERY_FIND_BY_ID,
-//                query = "SELECT invc FROM Invoice invc WHERE invc.id = :id"),
-//        @NamedQuery(name = Invoice.NAMED_QUERY_FIND_BY_ORDER_ID,
-//                query = "SELECT invc FROM Invoice invc WHERE invc.orderId = :orderId")
-//})
 @IdClass(InvoicePk.class)
 public class Invoice implements Serializable {
-//    public static final String NAMED_QUERY_FIND_BY_INVOCICENUMBER_PAYMENTNUMBER = "InvoiceService.findByInvoiceNumberAndPaymentNumber";
-//    public static final String NAMED_QUERY_FIND_BY_ID = "InvoiceService.findById";
-//    public static final String NAMED_QUERY_FIND_BY_ORDER_ID = "InvoiceService.findByOrderId";
 
     public Invoice() {
     }
-
 
 //    public Invoice(String invoiceNumber, String paymentNumber, InvoiceType invoiceType, BigDecimal amount, ServiceMethod serviceMethod, PaymentStatus paymentStatus, Channel channel, String userId, String deviceSerialId) {
 //        this.invoiceType = invoiceType;

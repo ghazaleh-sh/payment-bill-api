@@ -12,12 +12,7 @@ import java.util.Collection;
 @Getter
 @Entity
 @Table(name = "PAY_REQUEST")
-//@NamedQueries({
-//        @NamedQuery(name = PayRequest.NAMED_QUERY_FIND_BY_PAYEE,
-//                query = "SELECT pr FROM PayRequest pr WHERE pr.payee.id = :payeeId and pr.channel = :channel")
-//})
 public class PayRequest {
-//    public static final String NAMED_QUERY_FIND_BY_PAYEE = "PayRequest.findByPayee";
 
     public PayRequest(){
 

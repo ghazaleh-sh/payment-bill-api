@@ -1,6 +1,8 @@
 package ir.co.sadad.paymentBill.services;
 
 import ir.co.sadad.paymentBill.PaymentBillApiApplicationTests;
+import ir.co.sadad.paymentBill.dtos.BillInquiryReqDto;
+import ir.co.sadad.paymentBill.dtos.BillInquiryResDto;
 import ir.co.sadad.paymentBill.dtos.InvoicePaymentReqDto;
 import ir.co.sadad.paymentBill.dtos.InvoiceVerifyReqDto;
 import ir.co.sadad.paymentBill.dtos.ipg.*;
@@ -39,6 +41,7 @@ class InvoicePaymentServiceImplTest extends PaymentBillApiApplicationTests {
 
     private InvoicePaymentReqDto invoicePaymentReqDto;
     private FinalBillPaymentReqDto finalBillPaymentReqDto;
+    private BillInquiryReqDto billInquiryReqDto;
 
 //    @Autowired
     private InvoiceValidator validator = new InvoiceValidator();
@@ -134,5 +137,30 @@ class InvoicePaymentServiceImplTest extends PaymentBillApiApplicationTests {
 
     }
 
+    /////////////////////////// bill inquiry method /////////////////////////////
+    @Test
+    void shouldThrowNotValidExceptionByInquiry() {
+        billInquiryReqDto = new BillInquiryReqDto();
 
+        assertThrows(BillPaymentException.class, () -> billInquiryReqDto.setInvoiceNumber(""));
+    }
+
+    @Test
+    void shouldThrowNotExistExceptionByInquiry() {
+        billInquiryReqDto = new BillInquiryReqDto();
+        billInquiryReqDto.setInvoiceNumber("4337680730100");
+        billInquiryReqDto.setPaymentNumber("100571");
+
+        assertThrows(BillPaymentException.class, () -> service.billInquiry(billInquiryReqDto));
+    }
+
+    @Test
+    void shouldReturnTrueByInquiry() {
+        billInquiryReqDto = new BillInquiryReqDto();
+        billInquiryReqDto.setInvoiceNumber("4337680730155");
+        billInquiryReqDto.setPaymentNumber("100571");
+
+        BillInquiryResDto billInquiryResDto = service.billInquiry(billInquiryReqDto);
+        assertEquals("4337680730155", billInquiryResDto.getInvoiceNumber());
+    }
 }

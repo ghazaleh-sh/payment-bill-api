@@ -40,8 +40,7 @@ public class BasicWebClient<T, K> {
             return response;
         } catch (RestClientException e) {
             log.error("ERROR IS EXTERNAL SERVICE>>>>>>>>>>>>>>>>>", e);
-            return null;
-//            throw new ServiceUnavailableException(serviceUnavailableMessage());
+            throw new ServiceUnavailableException(e.getMessage());
 
         }
 
@@ -57,8 +56,6 @@ public class BasicWebClient<T, K> {
                             .queryParam("SignData", requestParamVO.getSignData())
 //                               .queryParam("orderId", requestParamVO.getOrderId())
                             .build())
-//                    .body(BodyInserters.fromValue(request.body)), new ParameterizedTypeReference<T>() {
-//                    })
                     .retrieve()
                     .bodyToMono(responseType)
                     .onErrorMap(e -> {

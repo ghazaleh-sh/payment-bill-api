@@ -35,7 +35,6 @@ public class InvoiceValidator implements ConstraintValidator<InvoiceValid, Invoi
         int mod = checkInvoiceId(invoiceIdSubstring);
 
         if (mod != Integer.parseInt(invoiceNumber.substring(invoiceNumber.length() - 1))) {
-//            throw new CodedException(ExceptionType.IllegalArgumentCoddedException,"E4000001", "error.invoice_number_is_invalid");
             throw new BillPaymentException("error.invoice.number.is.invalid" , HttpStatus.BAD_REQUEST);
         }
 

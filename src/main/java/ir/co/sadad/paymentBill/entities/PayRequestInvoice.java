@@ -12,12 +12,7 @@ import java.sql.Timestamp;
 @Getter
 @Entity
 @Table(name = "PAY_REQUEST_INVOICE")
-//@NamedQueries({
-//        @NamedQuery(name = PayRequestInvoice.NAMED_QUERY_FIND_BY_PAYEE_REQUEST_INVOICE,
-//                query = "SELECT pri FROM PayRequestInvoice pri WHERE pri.payRequest.id = :payeeRequestId and pri.invoice.id = :neoInvoiceId")
-//})
 public class PayRequestInvoice {
-//    public static final String NAMED_QUERY_FIND_BY_PAYEE_REQUEST_INVOICE = "PayRequestInvoice.findByPayeeRequestInvoice";
 
     public PayRequestInvoice() {
     }

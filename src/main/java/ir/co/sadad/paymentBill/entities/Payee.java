@@ -13,12 +13,7 @@ import java.sql.Timestamp;
 @Setter
 @Entity
 @Table(name = "PAYEE")
-//@NamedQueries({
-//        @NamedQuery(name = Payee.NAMED_QUERY_FIND_BY_PAYEEIDENTIFIER,
-//                query = "SELECT p FROM Payee p WHERE p.payeeIdentifier = :payeeIdentifier")
-//})
 public class Payee implements Serializable {
-//    public static final String NAMED_QUERY_FIND_BY_PAYEEIDENTIFIER = "Payee.findByPayeeIdentifier";
 
     public Payee() {
     }

@@ -66,8 +66,6 @@ public class InvoicePaymentServiceImpl implements InvoicePaymentService {
     @Value(value = "${invoice.returnUrl}")
     String returnUrl;
 
-//    TokenDecoder tokenDecoder;
-
     /**
      * using for charge module of old project(JEE based) which not implemented in this project completely
      *

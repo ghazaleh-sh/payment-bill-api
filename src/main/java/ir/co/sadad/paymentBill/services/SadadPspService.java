@@ -12,7 +12,6 @@ import ir.co.sadad.paymentBill.dtos.ipg.IPGPaymentRequestResDto;
 import ir.co.sadad.paymentBill.dtos.ipg.IPGVerifyReqDto;
 import ir.co.sadad.paymentBill.dtos.ipg.IPGVerifyResDto;
 import ir.co.sadad.paymentBill.dtos.payment.*;
-import ir.co.sadad.paymentBill.enums.ExceptionType;
 import ir.co.sadad.paymentBill.services.basics.BasicWebClient;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
