@@ -157,10 +157,10 @@ class InvoicePaymentServiceImplTest extends PaymentBillApiApplicationTests {
     @Test
     void shouldReturnTrueByInquiry() {
         billInquiryReqDto = new BillInquiryReqDto();
-        billInquiryReqDto.setInvoiceNumber("4337680730155");
-        billInquiryReqDto.setPaymentNumber("100571");
+        billInquiryReqDto.setInvoiceNumber("3768073015510");
+        billInquiryReqDto.setPaymentNumber("26206938");
 
         BillInquiryResDto billInquiryResDto = service.billInquiry(billInquiryReqDto);
-        assertEquals("4337680730155", billInquiryResDto.getInvoiceNumber());
+        assertEquals("3768073015510", billInquiryResDto.getInvoiceNumber());
     }
 }

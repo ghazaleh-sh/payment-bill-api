@@ -5,6 +5,7 @@ import ir.co.sadad.paymentBill.enums.*;
 import lombok.Builder;
 import lombok.Getter;
 
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
 /**
@@ -42,6 +43,7 @@ public class BillInquiryResDto {
     /**
      * status of payment
      */
+    @NotNull
     private PaymentStatus paymentStatus;
 
     /**
@@ -58,5 +60,19 @@ public class BillInquiryResDto {
      * card number used for the paid bills - is null for unpaid and inconclusive status
      */
     private String cardNo;
+
+    private Long creationDateTime;
+
+    private Long updateDateTime;
+
+    private String realTransactionDateTime;
+
+    private String traceNumber;
+
+    private String referenceNumber;
+
+    private String hashedCardNo;
+
+    private String transactionDescription;
 
 }

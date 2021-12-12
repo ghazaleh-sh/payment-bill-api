@@ -203,6 +203,9 @@ public class InvoicePaymentServiceImpl implements InvoicePaymentService {
                 .serviceMethod(invoice.getServiceMethod())
                 .serviceProvider(invoice.getServiceProvider())
                 .userId(invoice.getUserId())
+                .traceNumber(invoice.getTraceNumber())
+                .updateDateTime(invoice.getUpdateDateTime() == null ? null : invoice.getUpdateDateTime().getTime())
+                .referenceNumber(invoice.getReferenceNumber())
                 .build();
 
     }

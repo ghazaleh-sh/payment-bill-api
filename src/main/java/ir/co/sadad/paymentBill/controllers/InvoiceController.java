@@ -83,7 +83,7 @@ public class InvoiceController {
     }
 
     @Operation(summary = "سرویس استعلام قبض", description = "سرویسی که با دریافت شناسه قبض و شناسه پرداخت موارد آنرا استعلام میکند")
-    @GetMapping(value = "/bill-inquiry")
+    @PostMapping(value = "/bill-inquiry")
     public ResponseEntity<BillInquiryResDto> inquiry(@Valid @RequestBody BillInquiryReqDto billInquiryReqDto) {
         return new ResponseEntity<>(invoicePaymentService.billInquiry(billInquiryReqDto), HttpStatus.OK);
     }
