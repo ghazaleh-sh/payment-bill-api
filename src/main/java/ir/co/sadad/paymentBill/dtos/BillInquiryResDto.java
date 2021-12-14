@@ -58,6 +58,7 @@ public class BillInquiryResDto {
 
     /**
      * card number used for the paid bills - is null for unpaid and inconclusive status
+     * this field name will be changed to "sourceNo" by invoice-integration router
      */
     private String cardNo;
 

@@ -10,18 +10,10 @@ import ir.co.sadad.paymentBill.enums.IpgVerificationStatus;
 import ir.co.sadad.paymentBill.exceptions.BillPaymentException;
 import ir.co.sadad.paymentBill.exceptions.CodedException;
 import ir.co.sadad.paymentBill.services.basics.BasicWebClient;
-import ir.co.sadad.paymentBill.validations.InvoiceValidator;
-import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.validation.ConstraintValidatorContext;
-import javax.validation.ConstraintViolation;
-import java.math.BigDecimal;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -43,8 +35,6 @@ class InvoicePaymentServiceImplTest extends PaymentBillApiApplicationTests {
     private FinalBillPaymentReqDto finalBillPaymentReqDto;
     private BillInquiryReqDto billInquiryReqDto;
 
-//    @Autowired
-    private InvoiceValidator validator = new InvoiceValidator();
 
 /////////////////////////// billPaymentByIpg method /////////////////////////////
     @Test
