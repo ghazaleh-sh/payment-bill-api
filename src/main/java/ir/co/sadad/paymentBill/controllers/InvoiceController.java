@@ -69,7 +69,7 @@ public class InvoiceController {
 
     }
 
-    @Scope(values = "ipg-payment-verfiy")
+    @Scope(values = "ipg-payment-verify")
     @Operation(summary = "سرویس تایید پرداخت پی اس پی", description = "سرویسی که جهت تایید پرداخت توسط پی اس پی از طریق درگاه ipg کال میشود.")
     @PostMapping(value = "/ipg-bill-verify")
     public ResponseEntity<FinalBillPaymentResDto> finalBillPaymentByIpg(
