@@ -37,7 +37,7 @@ public class PayRequest {
     @OneToMany(mappedBy = "payRequest")
     private Collection<PayRequestInvoice> payRequestInvoices;
 
-    @Column(name="CHANNEL" , length = 15 ,nullable = false)
+    @Column(name="CHANNEL" , length = 15 ,nullable = false, columnDefinition = "CHAR(15) NOT NULL")
     @Enumerated(EnumType.STRING)
     @NotNull
     private Channel channel;

@@ -48,18 +48,18 @@ public class Invoice implements Serializable {
     private Long orderId;
 
     @Id
-    @Column(name = "INVOICE_NUMBER", length = 13, nullable = false)
+    @Column(name = "INVOICE_NUMBER", length = 13, nullable = false, columnDefinition = "CHAR(13) NOT NULL")
     @Size(max = 13)
     @NotNull
     private String invoiceNumber;
 
     @Id
-    @Column(name = "PAYMENT_NUMBER", length = 13, nullable = false)
+    @Column(name = "PAYMENT_NUMBER", length = 13, nullable = false, columnDefinition = "CHAR(13) NOT NULL")
     @Size(max = 13)
     @NotNull
     private String paymentNumber;
 
-    @Column(name = "INVOICE_TYPE", length = 10, nullable = false)
+    @Column(name = "INVOICE_TYPE", length = 10, nullable = false, columnDefinition = "CHAR NOT NULL")
     @Enumerated(EnumType.STRING)
     @NotNull
     private InvoiceType invoiceType;
@@ -72,17 +72,17 @@ public class Invoice implements Serializable {
     @NotNull
     private Timestamp creationDateTime;
 
-    @Column(name = "PAYMENT_TYPE", length = 15, nullable = false)
+    @Column(name = "PAYMENT_TYPE", length = 15, nullable = false, columnDefinition = "CHAR(15) NOT NULL")
     @Enumerated(EnumType.STRING)
     @NotNull
     private ServiceMethod serviceMethod;
 
-    @Column(name = "PAYMENT_STATUS", length = 15, nullable = false)
+    @Column(name = "PAYMENT_STATUS", length = 15, nullable = false, columnDefinition = "CHAR NOT NULL")
     @Enumerated(EnumType.STRING)
     @NotNull
     private PaymentStatus paymentStatus;
 
-    @Column(name = "CHANNEL", length = 15, nullable = false)
+    @Column(name = "CHANNEL", length = 15, nullable = false, columnDefinition = "CHAR(15) NOT NULL")
     @Enumerated(EnumType.STRING)
     @NotNull
     private Channel channel;
@@ -94,10 +94,10 @@ public class Invoice implements Serializable {
     @Column(name = "REAL_TRANSACTION_DATETIME")
     private Timestamp realTransactionDateTime;
 
-    @Column(name = "TRACE_NUMBER", length = 10)
+    @Column(name = "TRACE_NUMBER", length = 10, columnDefinition = "CHAR(10)")
     private String traceNumber;
 
-    @Column(name = "REFERENCE_NUMBER", length = 15)
+    @Column(name = "REFERENCE_NUMBER", length = 15, columnDefinition = "CHAR")
     private String referenceNumber;
 
     @Column(name = "UPDATE_DATE_TIME")
@@ -110,13 +110,13 @@ public class Invoice implements Serializable {
     @Column(name = "HASHED_CARD_NO")
     private String hashedCardNo;
 
-    @Column(name = "CARD_NO")
+    @Column(name = "CARD_NO", columnDefinition = "CHAR")
     private String cardNo;
 
     @Column(name = "TRANSACTION_DESCRIPTION")
     private String transactionDescription;
 
-    @Column(name = "USER_ID", length = 15)
+    @Column(name = "USER_ID", length = 15, columnDefinition = "CHAR(15)")
     private String userId;
 
     @Column(name = "DEVICE_SERIAL_ID", length = 40)

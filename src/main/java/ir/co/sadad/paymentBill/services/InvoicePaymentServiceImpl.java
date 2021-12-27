@@ -114,7 +114,7 @@ public class InvoicePaymentServiceImpl implements InvoicePaymentService {
     public InvoiceVerifyReqDto invoiceRegister(InvoicePaymentReqDto invoicePaymentReqDto) {
 
         String userId = "158";
-        String cellPhone ="09218301631";
+        String cellPhone ="989357376999";
         String serialId = "5700cd58-3cd6-4ce3-81ff-ee519e1f6df7";
 
         Invoice savedinvoice = invoiceCreation(invoicePaymentReqDto, UserVO.of(userId, cellPhone, serialId));
