@@ -1,10 +1,9 @@
 package ir.co.sadad.paymentBill.controllers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import ir.co.sadad.paymentBill.exceptions.BillPaymentException;
 import ir.co.sadad.paymentBill.exceptions.GlobalErrorResponse;
 import ir.co.sadad.paymentBill.exceptions.ServiceUnavailableException;
+import ir.co.sadad.paymentBill.exceptions.MyWebClientRequestException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.exception.JDBCConnectionException;
@@ -17,7 +16,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.client.HttpClientErrorException;
 
 import javax.validation.ConstraintViolationException;
 import java.net.ConnectException;
@@ -85,6 +83,21 @@ public class AppErrorAdvice {
                 .setTimestamp(new Date().getTime())
                 .setCode("E" + HttpStatus.REQUEST_TIMEOUT.value() + ERROR_CODE_TAIL)
                 .setLocalizedMessage(messageSource.getMessage("core.service.timeout.exception", null, new Locale("fa")));
+
+        return new ResponseEntity<>(globalErrorResponse, HttpStatus.REQUEST_TIMEOUT);
+
+    }
+
+    @ExceptionHandler(MyWebClientRequestException.class)
+    public ResponseEntity<GlobalErrorResponse> handleWebClientRequestException(MyWebClientRequestException ex) {
+        log.warn("Connection Timeout Exception: ", ex);
+
+        GlobalErrorResponse globalErrorResponse = new GlobalErrorResponse();
+        globalErrorResponse
+                .setStatus(HttpStatus.REQUEST_TIMEOUT)
+                .setTimestamp(new Date().getTime())
+                .setCode("E" + HttpStatus.REQUEST_TIMEOUT.value() + ERROR_CODE_TAIL)
+                .setLocalizedMessage(messageSource.getMessage("core.shaparak.service.timeout.exception", null, new Locale("fa")));
 
         return new ResponseEntity<>(globalErrorResponse, HttpStatus.REQUEST_TIMEOUT);
 

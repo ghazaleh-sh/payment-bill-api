@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpStatusCodeException;
+import org.springframework.web.reactive.function.client.WebClientRequestException;
 
 /**
  * a service for making outer service calls to sadad.shaparak url
@@ -70,6 +71,8 @@ public class SadadPspService {
         } catch (ServiceUnavailableException e) {
 //            throw new CodedException(ExceptionType.PaymentAPIConnectionException, "E5000002", "EINP50010003");
             throw new ServiceUnavailableException("payment.request.unavailable");
+        } catch (WebClientRequestException eWeb){
+            throw new MyWebClientRequestException(eWeb.getMessage());
         }
 
     }

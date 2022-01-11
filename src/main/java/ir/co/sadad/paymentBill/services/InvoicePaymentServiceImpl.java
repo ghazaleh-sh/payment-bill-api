@@ -117,9 +117,9 @@ public class InvoicePaymentServiceImpl implements InvoicePaymentService {
         String cellPhone ="989357376999";
         String serialId = "5700cd58-3cd6-4ce3-81ff-ee519e1f6df7";
 
-        Invoice savedinvoice = invoiceCreation(invoicePaymentReqDto, UserVO.of(userId, cellPhone, serialId));
+        Invoice savedInvoice = invoiceCreation(invoicePaymentReqDto, UserVO.of(userId, cellPhone, serialId));
 
-        PspInvoiceRegistrationReqDto pspInvoiceRegistrationReqDto = prepareInvoiceRegistration(savedinvoice);
+        PspInvoiceRegistrationReqDto pspInvoiceRegistrationReqDto = prepareInvoiceRegistration(savedInvoice);
 
         String signData = encoder.prepareSignDataForRegistration(pspInvoiceRegistrationReqDto.getTerminalId(), String.valueOf(pspInvoiceRegistrationReqDto.getOrderId()), pspInvoiceRegistrationReqDto.getAmount());
         pspInvoiceRegistrationReqDto.setSignData(signData);
@@ -128,7 +128,7 @@ public class InvoicePaymentServiceImpl implements InvoicePaymentService {
         String token = processGetTokenResponse(generalRegistrationResponse);
 
         InvoiceVerifyReqDto verifyResponse = new InvoiceVerifyReqDto();
-        verifyResponse.setOrderId(String.valueOf(savedinvoice.getOrderId()));
+        verifyResponse.setOrderId(String.valueOf(savedInvoice.getOrderId()));
         verifyResponse.setToken(token);
         return verifyResponse;
     }
@@ -145,13 +145,13 @@ public class InvoicePaymentServiceImpl implements InvoicePaymentService {
     @Override
     public InvoiceVerifyReqDto BillPaymentByIpg(InvoicePaymentReqDto invoicePaymentReqDto, UserVO userVo, String authToken){
 
-        Invoice savedinvoice = invoiceCreation(invoicePaymentReqDto, userVo);
+        Invoice savedInvoice = invoiceCreation(invoicePaymentReqDto, userVo);
 
-        String pspToken = sadadPspService.requestPaymentByIpg(makeIpgPaymentRequest(savedinvoice, invoicePaymentReqDto,userVo) , authToken);
+        String pspToken = sadadPspService.requestPaymentByIpg(makeIpgPaymentRequest(savedInvoice, invoicePaymentReqDto,userVo) , authToken);
 
         InvoiceVerifyReqDto billPaymentResDto = new InvoiceVerifyReqDto();
         billPaymentResDto.setToken(pspToken);
-        billPaymentResDto.setOrderId(savedinvoice.getOrderId().toString());
+        billPaymentResDto.setOrderId(savedInvoice.getOrderId().toString());
         return billPaymentResDto;
 
     }
