@@ -16,6 +16,7 @@ services:
       - "psp-payment-gateway-srv : 192.168.53.73"
     volumes:
       - /var/log/payment-bill-api:/var/log/payment-bill-api
+      - /opt/configs/payment-bill:/opt/configs/payment-bill
     environment:
       - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
       - JVM_OPTS=-Dfile.encoding=UTF8
