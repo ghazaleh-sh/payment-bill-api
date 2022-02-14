@@ -35,10 +35,10 @@ public class InvoiceController {
 
     private final InvoicePaymentService invoicePaymentService;
 
-    @GetMapping(value = "/id")
-    public ResponseEntity<HttpStatus> find(@RequestParam("id") Integer id) {
-        return new ResponseEntity(HttpStatus.OK);
-    }
+//    @GetMapping(value = "/id")
+//    public ResponseEntity<HttpStatus> find(@RequestParam("id") Integer id) {
+//        return new ResponseEntity(HttpStatus.OK);
+//    }
 
     @PostMapping(value = "/oldRegister")
     public ResponseEntity<InvoiceVerifyReqDto> create(@InvoiceValid @RequestBody InvoicePaymentReqDto invoicePaymentReqDto) {

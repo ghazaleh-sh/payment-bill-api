@@ -18,10 +18,6 @@ public enum InvoiceType {
         this.value = value;
     }
 
-//    public Integer getValue() {
-//        return value;
-//    }
-
     public static InvoiceType getEnum(Integer val) {
         switch (val) {
             case 1:

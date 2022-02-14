@@ -1,4 +1,4 @@
-package ir.co.sadad.paymentBill.common;
+package ir.co.sadad.paymentBill.commons;
 
 import io.netty.channel.ChannelOption;
 import io.netty.handler.logging.LogLevel;

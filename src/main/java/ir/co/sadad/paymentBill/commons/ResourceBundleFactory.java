@@ -1,4 +1,4 @@
-package ir.co.sadad.paymentBill.common;
+package ir.co.sadad.paymentBill.commons;
 
 import java.io.*;
 import java.util.Locale;

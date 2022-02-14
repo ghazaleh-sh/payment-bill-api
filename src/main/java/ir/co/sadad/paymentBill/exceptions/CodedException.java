@@ -1,10 +1,12 @@
 package ir.co.sadad.paymentBill.exceptions;
 
 import ir.co.sadad.paymentBill.enums.ExceptionType;
+import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter
 public class CodedException extends RuntimeException {
 
     private transient int status;
@@ -35,22 +37,6 @@ public class CodedException extends RuntimeException {
         for (String message : messages) {
             this.messages.add(message);
         }
-    }
-
-    public int getStatus() {
-        return status;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public String getErrorSummary() {
-        return errorSummary;
-    }
-
-    public List<String> getMessages() {
-        return messages;
     }
 
 }

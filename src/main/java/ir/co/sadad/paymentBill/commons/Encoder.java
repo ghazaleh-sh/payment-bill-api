@@ -1,4 +1,4 @@
-package ir.co.sadad.paymentBill.common;
+package ir.co.sadad.paymentBill.commons;
 
 import ir.co.sadad.paymentBill.exceptions.InternalServerException;
 import org.springframework.beans.factory.annotation.Value;

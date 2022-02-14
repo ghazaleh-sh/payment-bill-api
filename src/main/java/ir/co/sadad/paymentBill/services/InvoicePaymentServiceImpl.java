@@ -6,9 +6,7 @@ import ir.co.sadad.paymentBill.dtos.ipg.FinalBillPaymentReqDto;
 import ir.co.sadad.paymentBill.dtos.ipg.FinalBillPaymentResDto;
 import ir.co.sadad.paymentBill.dtos.ipg.IPGPaymentRequestReqDto;
 import ir.co.sadad.paymentBill.dtos.ipg.IPGVerifyReqDto;
-import ir.co.sadad.paymentBill.dtos.payment.PaymentRegistration;
-import ir.co.sadad.paymentBill.dtos.payment.PaymentVerificationResponse;
-import ir.co.sadad.paymentBill.dtos.payment.PspPaymentRegistrationRegistrationRequest;
+import ir.co.sadad.paymentBill.dtos.payment.PaymentVerificationResDto;
 import ir.co.sadad.paymentBill.entities.Invoice;
 import ir.co.sadad.paymentBill.entities.PayRequest;
 import ir.co.sadad.paymentBill.entities.PayRequestInvoice;
@@ -16,13 +14,12 @@ import ir.co.sadad.paymentBill.entities.Payee;
 import ir.co.sadad.paymentBill.enums.*;
 import ir.co.sadad.paymentBill.exceptions.BillPaymentException;
 import ir.co.sadad.paymentBill.exceptions.CodedException;
-import ir.co.sadad.paymentBill.exceptions.TokenGenerationException;
 import ir.co.sadad.paymentBill.repositories.InvoiceRepository;
 import ir.co.sadad.paymentBill.repositories.PayRequestInvoiceRepository;
 import ir.co.sadad.paymentBill.repositories.PayRequestRepository;
 import ir.co.sadad.paymentBill.repositories.PayeeRepository;
-import ir.co.sadad.paymentBill.common.Encoder;
-import ir.co.sadad.paymentBill.common.ResourceBundleFactory;
+import ir.co.sadad.paymentBill.commons.Encoder;
+import ir.co.sadad.paymentBill.commons.ResourceBundleFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +30,6 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -41,7 +37,7 @@ import java.util.ResourceBundle;
 import static ir.co.sadad.paymentBill.Constants.PAYMENT_BILL_SERVICE_TYPE;
 
 /**
- * a service between rest controller and sadadPsp services. using to send the request to psp
+ * a service to handles payments by psp directly of via ipg, inquiry the the input bill info.
  *
  * @author g.shahrokhabadi
  */
@@ -66,26 +62,13 @@ public class InvoicePaymentServiceImpl implements InvoicePaymentService {
     @Value(value = "${invoice.returnUrl}")
     String returnUrl;
 
-    /**
-     * using for charge module of old project(JEE based) which not implemented in this project completely
-     *
-     * @param paymentRegistration
-     * @return
-     * @throws TokenGenerationException
-     */
-    public String getPaymentToken(PaymentRegistration paymentRegistration) throws TokenGenerationException {
-        PspPaymentRegistrationRegistrationRequest pspPaymentRegistrationRequest = preparePaymentRegsitrationRequest(paymentRegistration);
-        GeneralRegistrationResponse generalRegistrationResponse = sadadPspService.registerPayment(pspPaymentRegistrationRequest);
-        return processGetTokenResponse(generalRegistrationResponse);
-    }
-    public PaymentVerificationResponse verifyPaymentTransaction(String token, String orderId) {
-        if (token == null || token.isEmpty()) {
-            throw new CodedException(ExceptionType.IllegalArgumentCoddedException, "E400005", "EINP40010009");
-        }
-        String base64SignedData = encoder.prepareSignDataWithToken(token);
-        GeneralVerificationResponse generalVerificationResponse = sadadPspService.verifyPayment(token, base64SignedData, orderId);
-        return processVerifyResponse(generalVerificationResponse);
-    }
+    @Value(value = "${old-registration.userId}")
+    private String userId;
+    @Value(value = "${old-registration.cellPhone}")
+    private String cellPhone;
+    @Value(value = "${old-registration.serialId}")
+    private String serialId;
+
 
     /** old method to verify the result of request payment
      *
@@ -100,8 +83,8 @@ public class InvoicePaymentServiceImpl implements InvoicePaymentService {
             throw new CodedException(ExceptionType.IllegalArgumentCoddedException, "E400005", "EINP40010009");
         }
         String base64SignedData = encoder.prepareSignDataWithToken(token);
-        GeneralVerificationResponse generalVerificationResponse = sadadPspService.verifyInvoiceByPsp(token, base64SignedData, orderId);
-        return processVerifyResponse(processVerifyResponse(generalVerificationResponse));
+        PaymentVerificationResDto paymentVerificationResDto = sadadPspService.verifyInvoiceByPsp(token, base64SignedData, orderId);
+        return updateTransactionInfo(paymentVerificationResDto);
     }
 
     /**
@@ -112,10 +95,6 @@ public class InvoicePaymentServiceImpl implements InvoicePaymentService {
     @SneakyThrows
     @Override
     public InvoiceVerifyReqDto invoiceRegister(InvoicePaymentReqDto invoicePaymentReqDto) {
-
-        String userId = "158";
-        String cellPhone ="989357376999";
-        String serialId = "5700cd58-3cd6-4ce3-81ff-ee519e1f6df7";
 
         Invoice savedInvoice = invoiceCreation(invoicePaymentReqDto, UserVO.of(userId, cellPhone, serialId));
 
@@ -156,7 +135,6 @@ public class InvoicePaymentServiceImpl implements InvoicePaymentService {
 
     }
 
-
     /**
      * verifies the result of payment bill by ipg services
      *
@@ -166,20 +144,18 @@ public class InvoicePaymentServiceImpl implements InvoicePaymentService {
     @Override
     public FinalBillPaymentResDto finalBillPaymentByIpg(FinalBillPaymentReqDto finalBillPaymentReqDto){
         //TODO: must be Validate before
-        Optional<Invoice> singleResult = invoiceRepository.findByOrderId(Long.valueOf(finalBillPaymentReqDto.getRequestId()));
+        Optional<Invoice> checkResult = invoiceRepository.findByOrderId(Long.valueOf(finalBillPaymentReqDto.getRequestId()));
+        Invoice singleResult = checkResult.orElseThrow(() -> new BillPaymentException("bill.is.not.exist.by.order.id", HttpStatus.BAD_REQUEST));
 
-        if (singleResult.isEmpty())
-            throw new BillPaymentException("bill.is.not.exist.by.order.id", HttpStatus.BAD_REQUEST);
-
-        if (singleResult.get().getPaymentStatus().equals(PaymentStatus.PAID))
+        if (singleResult.getPaymentStatus().equals(PaymentStatus.PAID))
             throw new BillPaymentException("bill.is.paid", HttpStatus.BAD_REQUEST);
 
-        if (!finalBillPaymentReqDto.getUserId().equals(singleResult.get().getUserId()))
+        if (!finalBillPaymentReqDto.getUserId().equals(singleResult.getUserId()))
             throw new BillPaymentException("userId.is.not.the.same", HttpStatus.BAD_REQUEST);
 
-        GeneralVerificationResponse generalVerificationResponse = sadadPspService.verifyBillPaymentByIpg(makeIpgVerifyRequest(finalBillPaymentReqDto));
+        PaymentVerificationResDto paymentVerifyRes = sadadPspService.verifyBillPaymentByIpg(makeIpgVerifyRequest(finalBillPaymentReqDto));
 
-        processVerifyResponse(processVerifyResponse(generalVerificationResponse));
+        updateTransactionInfo(paymentVerifyRes);
 
         FinalBillPaymentResDto finalResponse = new FinalBillPaymentResDto();
         finalResponse.setStatus(IpgVerificationStatus.SUCCESSFUL);
@@ -276,8 +252,8 @@ public class InvoicePaymentServiceImpl implements InvoicePaymentService {
     }
 
     private PspInvoiceRegistrationReqDto prepareInvoiceRegistration(Invoice invoice) {
-
-        return PspInvoiceRegistrationReqDto.builder().terminalId(this.terminalId)
+        return PspInvoiceRegistrationReqDto.builder()
+                .terminalId(this.terminalId)
                 .merchantId(this.merchantId)
                 .amount(String.valueOf(invoice.getAmount().intValue()))
                 .invoiceNumber(invoice.getInvoiceNumber())
@@ -287,66 +263,25 @@ public class InvoicePaymentServiceImpl implements InvoicePaymentService {
                 .build();
     }
 
-    /**
-     *  process
-     *
-     * @param response
-     * @return
-     */
+    private Invoice updateTransactionInfo(PaymentVerificationResDto transactionInfoRes) {
+        Optional<Invoice> checkInvoice = invoiceRepository.findByOrderId(transactionInfoRes.getOrderId());
+        Invoice existingInvoice = checkInvoice.orElseThrow(() -> new BillPaymentException("bill.is.not.exist.by.order.id", HttpStatus.BAD_REQUEST));
 
-    public Invoice processVerifyResponse(PaymentVerificationResponse response) {
-        if (response == null) {
-            throw new CodedException(ExceptionType.VerifyFailedCodedException, "EINP40010002", "EINP40010002");
-        } else {
-            String state;
-            String errorMessage;
-            Integer responseCode = Integer.valueOf(response.getStatusCode());
-            switch (responseCode) {
-                case 0:
-                    return updateTransactionInfo(response, PaymentStatus.PAID.toString());
-                case -1:
-                    errorMessage = "EINP42410001";
-                    state = PaymentStatus.UNPAID.toString();
-                    break;
-                case 101:
-                    errorMessage = "EINP42410002";
-                    state = PaymentStatus.UNPAID.toString();
-                    break;
-                default:
-                    errorMessage = "EINP50010002";
-                    state = PaymentStatus.UNPAID.toString();
-                    break;
+        String status = transactionInfoRes.getStatusCode().equals(0) ? PaymentStatus.PAID.toString() : PaymentStatus.UNPAID.toString();
 
-            }
-            updateTransactionInfo(response, state);
-            throw new CodedException(ExceptionType.VerifyFailedCodedException, "E400010", errorMessage, response.getDescription());
-        }
-    }
+        existingInvoice.setPaymentStatus(PaymentStatus.getEnum(status));
+        existingInvoice.setUpdateDateTime(new Timestamp(DateTime.now().getMillis()));
+        existingInvoice.setTraceNumber(transactionInfoRes.getTraceNo());
+        existingInvoice.setReferenceNumber(transactionInfoRes.getReferenceNo());
+        existingInvoice.setRealTransactionDateTime(Timestamp.valueOf(transactionInfoRes.getTransactionDate()));
+        existingInvoice.setCardNo(transactionInfoRes.getCardNo());
+        existingInvoice.setHashedCardNo(transactionInfoRes.getHashedCardNo());
+        existingInvoice.setTransactionDescription(transactionInfoRes.getDescription());
 
-    private Invoice updateTransactionInfo(PaymentVerificationResponse transactionInfo, String status) {
-        Invoice existingInvoice = invoiceRepository.findByOrderId(transactionInfo.getOrderId()).get();
-        if (transactionInfo == null) {
-            existingInvoice.setPaymentStatus(PaymentStatus.getEnum(status));
-        } else {
-            existingInvoice.setPaymentStatus(PaymentStatus.getEnum(status));
-            existingInvoice.setUpdateDateTime(new Timestamp(DateTime.now().getMillis()));
-            existingInvoice.setTraceNumber(transactionInfo.getTraceNo());
-            existingInvoice.setReferenceNumber(transactionInfo.getReferenceNo());
-            existingInvoice.setRealTransactionDateTime(Timestamp.valueOf(transactionInfo.getTransactionDate()));
-            existingInvoice.setCardNo(transactionInfo.getCardNo());
-            existingInvoice.setHashedCardNo(transactionInfo.getHashedCardNo());
-            existingInvoice.setTransactionDescription(transactionInfo.getDescription());
-        }
         return invoiceRepository.saveAndFlush(existingInvoice);
     }
 
-    public static PaymentVerificationResponse processVerifyResponse(GeneralVerificationResponse response) {
-        return new PaymentVerificationResponse(response.getOrderId() != null ? Long.valueOf(response.getOrderId()) : null
-                , response.getRetrivalRefNo(), response.getSystemTraceNo()
-                , LocalDateTime.now(), response.getDescription(), Integer.valueOf(response.getResCode()), response.getHashedCardNo(), response.getCardNo());
-    }
-
-    public static String processGetTokenResponse(GeneralRegistrationResponse generalRegistrationResponse) throws TokenGenerationException {
+    public static String processGetTokenResponse(GeneralRegistrationResponse generalRegistrationResponse) throws BillPaymentException {
         ResourceBundle resCodeResourceBundle = new ResourceBundleFactory().produceBundleWithLocale(Locale.ENGLISH, "ResponseCode");
         ResourceBundle switchResponseCodeBundle = new ResourceBundleFactory().produceBundleWithLocale(Locale.ENGLISH, "SwitchResponseCode");
         String resCode = generalRegistrationResponse.getResCode();
@@ -361,20 +296,7 @@ public class InvoicePaymentServiceImpl implements InvoicePaymentService {
             StringBuffer messages = new StringBuffer();
             messages.append("ResMsg:").append(responseMessage).append(". ").append("SwitchResMsg").append(switchResponseMessage);
             log.error(messages.toString());
-            throw new TokenGenerationException(responseMessage, resCode);
+            throw new BillPaymentException(responseMessage, Integer.decode(resCode), HttpStatus.BAD_REQUEST);
         }
-    }
-
-    /**
-     *  using for charge module of old project(JEE based) which not implemented in this project completely
-     * @param paymentRegistration
-     * @return
-     */
-    public PspPaymentRegistrationRegistrationRequest preparePaymentRegsitrationRequest(PaymentRegistration paymentRegistration) {
-        String signData = encoder.prepareSignDataForRegistration(paymentRegistration.getTerminalId(), String.valueOf(paymentRegistration.getOrderId()), paymentRegistration.getAmount());
-        return new PspPaymentRegistrationRegistrationRequest.Builder()
-                .addAlreadyExistRegisteredPayment(paymentRegistration)
-                .signData(signData)
-                .build();
     }
 }

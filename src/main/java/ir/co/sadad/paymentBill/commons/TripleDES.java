@@ -1,4 +1,4 @@
-package ir.co.sadad.paymentBill.common;
+package ir.co.sadad.paymentBill.commons;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.util.encoders.Base64;
