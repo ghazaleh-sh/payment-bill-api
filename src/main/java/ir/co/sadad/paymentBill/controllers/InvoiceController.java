@@ -41,6 +41,7 @@ public class InvoiceController {
 //    }
 
     @PostMapping(value = "/oldRegister")
+    @Operation(summary = "سرویس دریافت مستقیم توکن از پی اس پی", description = "این سرویس برای تست ارتباط مستقیم با پی اس پی نگه داشته شده است. ")
     public ResponseEntity<InvoiceVerifyReqDto> create(@InvoiceValid @RequestBody InvoicePaymentReqDto invoicePaymentReqDto) {
 
         InvoiceVerifyReqDto paymentResponseDto = invoicePaymentService.invoiceRegister(invoicePaymentReqDto);
@@ -48,6 +49,7 @@ public class InvoiceController {
     }
 
     @PutMapping
+    @Operation(summary = "سرویس تایید پرداخت از پی اس پی بطور مستقیم", description = "این سرویس برای تست ارتباط مستقیم با پی اس پی نگه داشته شده است. ")
     public ResponseEntity<HttpStatus> verifyInvoicePayment(@VerifyValid @RequestBody InvoiceVerifyReqDto invoiceVerifyReqDto) {
         invoicePaymentService.verifyInvoicePayment(invoiceVerifyReqDto.getToken(), invoiceVerifyReqDto.getOrderId());
         return new ResponseEntity(HttpStatus.OK);

@@ -1,7 +1,6 @@
-package ir.co.sadad.paymentBill.dtos.payment;
+package ir.co.sadad.paymentBill.dtos;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import ir.co.sadad.paymentBill.dtos.RegisterDto;
 import lombok.Getter;
 import lombok.Setter;
 

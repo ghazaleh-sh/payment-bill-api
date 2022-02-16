@@ -1,4 +1,4 @@
-package ir.co.sadad.paymentBill.dtos.payment;
+package ir.co.sadad.paymentBill.dtos;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
