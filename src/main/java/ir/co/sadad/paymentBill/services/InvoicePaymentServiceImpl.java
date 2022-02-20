@@ -37,7 +37,7 @@ import java.util.ResourceBundle;
 import static ir.co.sadad.paymentBill.Constants.PAYMENT_BILL_SERVICE_TYPE;
 
 /**
- * a service to handles payments by psp directly of via ipg, inquiry the the input bill info.
+ * a service to handle payments by psp directly, via ipg and inquiry the  bill info.
  *
  * @author g.shahrokhabadi
  */
@@ -70,25 +70,9 @@ public class InvoicePaymentServiceImpl implements InvoicePaymentService {
     private String serialId;
 
 
-    /** old method to verify the result of request payment
-     *
-     * @param token
-     * @param orderId
-     * @return
-     */
-    @Override
-    public Invoice verifyInvoicePayment(String token, String orderId) {
-
-        if (token == null || token.isEmpty()) {
-            throw new CodedException(ExceptionType.IllegalArgumentCoddedException, "E400005", "EINP40010009");
-        }
-        String base64SignedData = encoder.prepareSignDataWithToken(token);
-        PaymentVerificationResDto paymentVerificationResDto = sadadPspService.verifyInvoiceByPsp(token, base64SignedData, orderId);
-        return updateTransactionInfo(paymentVerificationResDto);
-    }
-
     /**
      * old method to get token of psp and registers invoice details in tables(if not exist)
+     *
      * @param invoicePaymentReqDto
      * @return
      */
@@ -113,6 +97,24 @@ public class InvoicePaymentServiceImpl implements InvoicePaymentService {
     }
 
     /**
+     * old method to verify the result of request payment
+     *
+     * @param token
+     * @param orderId
+     * @return
+     */
+    @Override
+    public Invoice verifyInvoicePayment(String token, String orderId) {
+
+        if (token == null || token.isEmpty()) {
+            throw new CodedException(ExceptionType.IllegalArgumentCoddedException, "E400005", "EINP40010009");
+        }
+        String base64SignedData = encoder.prepareSignDataWithToken(token);
+        PaymentVerificationResDto paymentVerificationResDto = sadadPspService.verifyInvoiceByPsp(token, base64SignedData, orderId);
+        return updateTransactionInfo(paymentVerificationResDto);
+    }
+
+    /**
      * takes token of psp through ipg services
      *
      * @param invoicePaymentReqDto
@@ -122,11 +124,11 @@ public class InvoicePaymentServiceImpl implements InvoicePaymentService {
      */
     @SneakyThrows
     @Override
-    public InvoiceVerifyReqDto BillPaymentByIpg(InvoicePaymentReqDto invoicePaymentReqDto, UserVO userVo, String authToken){
+    public InvoiceVerifyReqDto BillPaymentByIpg(InvoicePaymentReqDto invoicePaymentReqDto, UserVO userVo, String authToken) {
 
         Invoice savedInvoice = invoiceCreation(invoicePaymentReqDto, userVo);
 
-        String pspToken = sadadPspService.requestPaymentByIpg(makeIpgPaymentRequest(savedInvoice, invoicePaymentReqDto,userVo) , authToken);
+        String pspToken = sadadPspService.requestPaymentByIpg(makeIpgPaymentRequest(savedInvoice, invoicePaymentReqDto, userVo), authToken);
 
         InvoiceVerifyReqDto billPaymentResDto = new InvoiceVerifyReqDto();
         billPaymentResDto.setToken(pspToken);
@@ -142,7 +144,7 @@ public class InvoicePaymentServiceImpl implements InvoicePaymentService {
      * @return
      */
     @Override
-    public FinalBillPaymentResDto finalBillPaymentByIpg(FinalBillPaymentReqDto finalBillPaymentReqDto){
+    public FinalBillPaymentResDto finalBillPaymentByIpg(FinalBillPaymentReqDto finalBillPaymentReqDto) {
         //TODO: must be Validate before
         Optional<Invoice> checkResult = invoiceRepository.findByOrderId(Long.valueOf(finalBillPaymentReqDto.getRequestId()));
         Invoice singleResult = checkResult.orElseThrow(() -> new BillPaymentException("bill.is.not.exist.by.order.id", HttpStatus.BAD_REQUEST));
@@ -162,7 +164,13 @@ public class InvoicePaymentServiceImpl implements InvoicePaymentService {
         return finalResponse;
     }
 
-    public BillInquiryResDto billInquiry(BillInquiryReqDto billInquiryReqDto){
+    /**
+     * inquiries the bill information
+     *
+     * @param billInquiryReqDto
+     * @return
+     */
+    public BillInquiryResDto billInquiry(BillInquiryReqDto billInquiryReqDto) {
         Invoice invoice = invoiceRepository.findByInvoiceNumberAndPaymentNumber(billInquiryReqDto.getInvoiceNumber(), billInquiryReqDto.getPaymentNumber()).orElseThrow(
                 () -> new BillPaymentException("invoice.is.not.exist", HttpStatus.NOT_FOUND));
 
@@ -186,7 +194,7 @@ public class InvoicePaymentServiceImpl implements InvoicePaymentService {
 
     }
 
-    private IPGPaymentRequestReqDto makeIpgPaymentRequest(Invoice savedinvoice, InvoicePaymentReqDto invoicePaymentReqDto, UserVO user){
+    private IPGPaymentRequestReqDto makeIpgPaymentRequest(Invoice savedinvoice, InvoicePaymentReqDto invoicePaymentReqDto, UserVO user) {
         IPGPaymentRequestReqDto req = new IPGPaymentRequestReqDto();
         req.setAmount(Long.valueOf(invoicePaymentReqDto.getAmount()));
         req.setServiceType(PAYMENT_BILL_SERVICE_TYPE);
@@ -228,6 +236,7 @@ public class InvoicePaymentServiceImpl implements InvoicePaymentService {
         PayRequestInvoice savedPayReqInvoice = payReqInvoice.orElseGet(() -> new PayRequestInvoice(savedPayReq, savedInvoice));
         payRequestInvoiceRepository.saveAndFlush(savedPayReqInvoice);
 
+        log.info("tables of payment-bill created or updated successfully....");
         return savedInvoice;
     }
 
@@ -282,17 +291,17 @@ public class InvoicePaymentServiceImpl implements InvoicePaymentService {
     }
 
     public static String processGetTokenResponse(GeneralRegistrationResponse generalRegistrationResponse) throws BillPaymentException {
-        ResourceBundle resCodeResourceBundle = new ResourceBundleFactory().produceBundleWithLocale(Locale.ENGLISH, "ResponseCode");
-        ResourceBundle switchResponseCodeBundle = new ResourceBundleFactory().produceBundleWithLocale(Locale.ENGLISH, "SwitchResponseCode");
         String resCode = generalRegistrationResponse.getResCode();
-        String switchResCode = generalRegistrationResponse.getSwitchResCode();
-        String responseMessage = resCode != null ? resCodeResourceBundle.getString(resCode) : null;
-        String switchResponseMessage = (switchResCode == null || switchResCode.equals("")) ? null : switchResponseCodeBundle.getString(switchResCode);
         if (resCode.equals("0")) {
             return generalRegistrationResponse.getToken();
-        }
-        //todo log messages
-        else {
+        } else {
+            ResourceBundle resCodeResourceBundle = new ResourceBundleFactory().produceBundleWithLocale(Locale.ENGLISH, "ResponseCode");
+            ResourceBundle switchResponseCodeBundle = new ResourceBundleFactory().produceBundleWithLocale(Locale.ENGLISH, "SwitchResponseCode");
+
+            String switchResCode = generalRegistrationResponse.getSwitchResCode();
+            String responseMessage = resCode != null ? resCodeResourceBundle.getString(resCode) : null;
+            String switchResponseMessage = (switchResCode == null || switchResCode.equals("")) ? null : switchResponseCodeBundle.getString(switchResCode);
+
             StringBuffer messages = new StringBuffer();
             messages.append("ResMsg:").append(responseMessage).append(". ").append("SwitchResMsg").append(switchResponseMessage);
             log.error(messages.toString());

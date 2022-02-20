@@ -13,8 +13,6 @@ public interface InvoicePaymentService {
 
     Invoice verifyInvoicePayment(String token, String orderId);
 
-//    String getToken(InvoiceRegistration invoiceRegistration);
-
     InvoiceVerifyReqDto invoiceRegister(InvoicePaymentReqDto invoicePaymentReqDto);
 
     InvoiceVerifyReqDto BillPaymentByIpg(InvoicePaymentReqDto invoicePaymentReqDto, UserVO userVo, String authToken);

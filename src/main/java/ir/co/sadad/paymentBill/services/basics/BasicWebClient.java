@@ -85,8 +85,7 @@ public class BasicWebClient<T, K> {
                     })
                     .retrieve()
                     .onStatus(HttpStatus::isError, clientResponse -> clientResponse.bodyToMono(GlobalErrorResponse.class)
-//                            .onErrorResume(e -> Mono.error(new BillPaymentException(e.getMessage(), clientResponse.statusCode())))
-                              .flatMap(errorBody -> Mono.error(new BillPaymentException(errorBody, errorBody.getStatus())))
+                            .flatMap(errorBody -> Mono.error(new BillPaymentException(errorBody, errorBody.getStatus())))
                     )
                     .bodyToMono(responseType)
                     .block();

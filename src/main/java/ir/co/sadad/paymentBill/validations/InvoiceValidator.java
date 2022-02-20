@@ -4,28 +4,30 @@ import ir.co.sadad.paymentBill.dtos.InvoicePaymentReqDto;
 import ir.co.sadad.paymentBill.enums.ExceptionType;
 import ir.co.sadad.paymentBill.exceptions.BillPaymentException;
 import ir.co.sadad.paymentBill.exceptions.CodedException;
+import lombok.SneakyThrows;
 import org.springframework.http.HttpStatus;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import java.math.BigDecimal;
 
-//@Priority(10)
+
 public class InvoiceValidator implements ConstraintValidator<InvoiceValid, InvoicePaymentReqDto> {
 
     @Override
+    @SneakyThrows
     public boolean isValid(InvoicePaymentReqDto invoicePaymentReqDto, ConstraintValidatorContext constraintValidatorContext) {
 
-        if (invoicePaymentReqDto == null) {
-            return false;
-        }
-        checkInvoiceValidation(Long.toString(Long.parseLong(invoicePaymentReqDto.getInvoiceNumber())), Long.toString(Long.parseLong(invoicePaymentReqDto.getPaymentNumber())), new BigDecimal(invoicePaymentReqDto.getAmount()));
+//        if (invoicePaymentReqDto.isEmpty()) {
+//            return false;
+//        }
+        checkInvoiceValidation(invoicePaymentReqDto.getInvoiceNumber(), invoicePaymentReqDto.getPaymentNumber(), new BigDecimal(invoicePaymentReqDto.getAmount()));
         return true;
     }
 
     public void checkInvoiceValidation(String invoiceNumber, String paymentNumber, BigDecimal amount) {
-        if(invoiceNumber.equals("") || paymentNumber.equals(""))
-            throw new BillPaymentException("method.argument.not.valid" , HttpStatus.BAD_REQUEST);
+//        if(invoiceNumber.equals("") || paymentNumber.equals(""))
+//            throw new BillPaymentException("method.argument.not.valid" , HttpStatus.BAD_REQUEST);
 
         String tempInvoiceId = "0000000000000" + invoiceNumber;
         String invoiceIdSubstring = tempInvoiceId.substring(tempInvoiceId.length() - 13);

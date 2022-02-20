@@ -35,6 +35,7 @@ public class AppErrorAdvice {
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<GlobalErrorResponse> unhandledException(RuntimeException ex) {
+
         log.warn("Unhandled Exception: ", ex);
 
         GlobalErrorResponse globalErrorResponse = new GlobalErrorResponse();
@@ -70,11 +71,11 @@ public class AppErrorAdvice {
                 .setLocalizedMessage(localizedMessage);
 
         return new ResponseEntity<>(globalErrorResponse, ex.getHttpStatus());
-
     }
 
     @ExceptionHandler(ConnectException.class)
     public ResponseEntity<GlobalErrorResponse> handleConnectException(ConnectException ex) {
+
         log.warn("Connection Timeout Exception: ", ex);
 
         GlobalErrorResponse globalErrorResponse = new GlobalErrorResponse();
@@ -90,6 +91,7 @@ public class AppErrorAdvice {
 
     @ExceptionHandler(MyWebClientRequestException.class)
     public ResponseEntity<GlobalErrorResponse> handleWebClientRequestException(MyWebClientRequestException ex) {
+
         log.warn("Connection Timeout Exception: ", ex);
 
         GlobalErrorResponse globalErrorResponse = new GlobalErrorResponse();
@@ -105,6 +107,7 @@ public class AppErrorAdvice {
 
     @ExceptionHandler(JDBCConnectionException.class)
     public ResponseEntity<GlobalErrorResponse> handleJDBCConnectionException(JDBCConnectionException ex) {
+
         log.warn("JDBC Connection Exception: ", ex);
 
         GlobalErrorResponse globalErrorResponse = new GlobalErrorResponse();
@@ -120,6 +123,7 @@ public class AppErrorAdvice {
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<GlobalErrorResponse> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
+
         log.warn("api calling exception", ex);
 
         GlobalErrorResponse globalErrorResponse = new GlobalErrorResponse();
@@ -157,8 +161,7 @@ public class AppErrorAdvice {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<GlobalErrorResponse> handleValidationExceptions(
-            MethodArgumentNotValidException ex) {
+    public ResponseEntity<GlobalErrorResponse> handleValidationExceptions(MethodArgumentNotValidException ex) {
 
         log.warn("validation exception", ex);
 
@@ -181,9 +184,9 @@ public class AppErrorAdvice {
         return new ResponseEntity<>(globalErrorResponse, HttpStatus.BAD_REQUEST);
 
     }
-    @ExceptionHandler( ConstraintViolationException.class)
-    public ResponseEntity<GlobalErrorResponse> handleConstraintValidation(
-            ConstraintViolationException ex) {
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<GlobalErrorResponse> handleConstraintValidation(ConstraintViolationException ex) {
 
         log.warn("constraint validation exception", ex);
 
@@ -208,10 +211,8 @@ public class AppErrorAdvice {
     }
 
 
-
     @ExceptionHandler(MissingRequestHeaderException.class)
-    public ResponseEntity<GlobalErrorResponse> handleMissingRequestHeaderExceptions(
-            MissingRequestHeaderException ex) {
+    public ResponseEntity<GlobalErrorResponse> handleMissingRequestHeaderExceptions(MissingRequestHeaderException ex) {
 
         log.warn("missing request header exception", ex);
 
@@ -224,31 +225,5 @@ public class AppErrorAdvice {
         return new ResponseEntity<>(globalErrorResponse, HttpStatus.BAD_REQUEST);
 
     }
-//
-//    @ExceptionHandler(HttpClientErrorException.class)
-//    public ResponseEntity<GlobalErrorResponse> handleHttpClientErrorException(
-//            HttpClientErrorException ex) throws JsonProcessingException {
-//
-//        HttpClientErrorDto httpClientErrorDto = new ObjectMapper().readValue(ex.getResponseBodyAsString(), HttpClientErrorDto.class);
-//
-//        List<GlobalErrorResponse.SubError> subErrorList = new ArrayList<>();
-//        httpClientErrorDto.getErrors().forEach((error) -> {
-//            GlobalErrorResponse.SubError subError = new GlobalErrorResponse.SubError();
-//            subError.setCode("E" + ex.getStatusCode().value() + ERROR_CODE_TAIL);
-//            subError.setTimestamp(new Date().getTime());
-//            subError.setLocalizedMessage(error.getField() + " " + error.getDefaultMessage());
-//            subErrorList.add(subError);
-//        });
-//
-//        GlobalErrorResponse globalErrorResponse = new GlobalErrorResponse();
-//        globalErrorResponse
-//                .setStatus(ex.getStatusCode())
-//                .setTimestamp(new Date().getTime())
-//                .setCode("E" + ex.getStatusCode().value() + ERROR_CODE_TAIL)
-//                .setLocalizedMessage(messageSource.getMessage("method.argument.not.valid", null, new Locale("fa")))
-//                .setSubErrors(subErrorList);
-//        return new ResponseEntity<>(globalErrorResponse, ex.getStatusCode());
-//
-//    }
 
 }

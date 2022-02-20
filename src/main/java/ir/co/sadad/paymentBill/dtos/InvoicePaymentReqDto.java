@@ -1,47 +1,34 @@
 package ir.co.sadad.paymentBill.dtos;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+
 import javax.validation.constraints.NotBlank;
 
 /**
- * dto for first request of payment- using by ipg and old registration
+ * dto for first request of payment- using by ipg payment and old registration
  *
  * @author g.shahrokhabadi
  */
+@Data
 public class InvoicePaymentReqDto {
-
+    @Schema(title = " شماره قبض")
     @NotBlank
     private String invoiceNumber;
+
+    @Schema(title = " شماره پرداخت")
     @NotBlank
     private String paymentNumber;
+
+    @Schema(title = " مبلغ قبض")
     @NotBlank
     private String amount;
 
-    public String getInvoiceNumber() {
-        return invoiceNumber;
-    }
-
-    public void setInvoiceNumber(String invoiceNumber) {
-        String tempInvoiceId = "0000000000000" + invoiceNumber;
-        String invoiceIdSubstring = tempInvoiceId.substring(tempInvoiceId.length() - 13);
-        this.invoiceNumber = invoiceIdSubstring;
-    }
-
-    public String getPaymentNumber() {
-        return paymentNumber;
-    }
-
-    public void setPaymentNumber(String paymentNumber) {
-        String tempPaymentId = "0000000000000" + paymentNumber;
-        String paymentIdSubstring = tempPaymentId.substring(tempPaymentId.length() - 13);
-        this.paymentNumber = paymentIdSubstring;
-    }
-
-    public String getAmount() {
-        return amount;
-    }
-
-    public void setAmount(String amount) {
-        this.amount = amount;
-    }
+//
+//    public boolean isEmpty() {
+//        if (this.invoiceNumber == null && this.paymentNumber == null && this.amount == null)
+//            return true;
+//        else return false;
+//    }
 
 }

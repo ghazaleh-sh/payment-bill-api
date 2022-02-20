@@ -42,7 +42,7 @@ public class InvoiceController {
 
     @PostMapping(value = "/oldRegister")
     @Operation(summary = "سرویس دریافت مستقیم توکن از پی اس پی", description = "این سرویس برای تست ارتباط مستقیم با پی اس پی نگه داشته شده است. ")
-    public ResponseEntity<InvoiceVerifyReqDto> create(@InvoiceValid @RequestBody InvoicePaymentReqDto invoicePaymentReqDto) {
+    public ResponseEntity<InvoiceVerifyReqDto> create(@InvoiceValid @Valid @RequestBody InvoicePaymentReqDto invoicePaymentReqDto) {
 
         InvoiceVerifyReqDto paymentResponseDto = invoicePaymentService.invoiceRegister(invoicePaymentReqDto);
         return new ResponseEntity<>(paymentResponseDto, HttpStatus.OK);
@@ -63,7 +63,7 @@ public class InvoiceController {
             @RequestHeader(SERIAL_ID) String serialId,
             @RequestHeader(CELL_PHONE) String cellPhone,
             @RequestHeader(SSN) String ssn,
-            @InvoiceValid @RequestBody InvoicePaymentReqDto invoicePaymentReqDto) {
+            @InvoiceValid @Valid @RequestBody InvoicePaymentReqDto invoicePaymentReqDto) {
 
         InvoiceVerifyReqDto billPaymentResDto = invoicePaymentService.BillPaymentByIpg(invoicePaymentReqDto, UserVO.of(userId, cellPhone, serialId, ssn), authToken);
 

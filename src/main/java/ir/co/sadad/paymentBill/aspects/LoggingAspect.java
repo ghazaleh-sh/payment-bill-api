@@ -12,13 +12,15 @@ import java.util.Arrays;
 @Component
 public class LoggingAspect {
 
-    @Before("execution(* ir.co.sadad.paymentBill.services.*.*(..))") //point cut
+    @Before("execution(* ir.co.sadad.paymentBill.services.*.*(..))")
     public void beforeAllServiceMethods(JoinPoint joinPoint) {
-        log.info("********** started executing: " + joinPoint.getSignature().getName() + " with method param: " + Arrays.toString(joinPoint.getArgs()));
+        log.info("********** started executing: " + joinPoint.getSignature().getName() +
+                " with method param: " + Arrays.toString(joinPoint.getArgs()));
     }
 
     @AfterReturning(pointcut = "execution(* ir.co.sadad.paymentBill.services..*(..))", returning = "result")
     public void afterAllServiceMethods(JoinPoint joinPoint, Object result) {
-        log.info("********** completed executing: " + joinPoint.getSignature().getName() + " with return value: " + result);
+        log.info("********** completed executing: " + joinPoint.getSignature().getName() +
+                " with return value: " + result);
     }
 }

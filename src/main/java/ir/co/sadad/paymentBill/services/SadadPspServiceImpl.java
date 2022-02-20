@@ -25,14 +25,14 @@ import org.springframework.web.reactive.function.client.WebClientRequestExceptio
 import java.time.LocalDateTime;
 
 /**
- * a service for making outer service calls to sadad.shaparak url
+ * a service for making outer service calls to sadad.shaparak url directly and via ipg
  *
  * @author g.shahrokhabadi
  */
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class SadadPspServiceImpl implements SadadPspService{
+public class SadadPspServiceImpl implements SadadPspService {
 
     private final BasicWebClient<PspInvoiceRegistrationReqDto, GeneralRegistrationResponse> registerInvoiceWebClient;
     private final BasicWebClient<Object, GeneralVerificationResponse> verifyInvoiceWebClient;
@@ -41,7 +41,7 @@ public class SadadPspServiceImpl implements SadadPspService{
     private final BasicWebClient<IPGVerifyReqDto, IPGVerifyResDto> ipgVerifyWebClient;
 
     @Value(value = "${sadad.psp.base-url}")
-    private String sadadBaseUrl ;
+    private String sadadBaseUrl;
 
     @Value(value = "${ipg.request_token.url}")
     private String ipgPaymentRequestUrl;
@@ -52,6 +52,7 @@ public class SadadPspServiceImpl implements SadadPspService{
 
     /**
      * old method for taking token directly from psp
+     *
      * @param pspInvoiceRegistrationReq
      * @return
      */
@@ -65,13 +66,12 @@ public class SadadPspServiceImpl implements SadadPspService{
 
             if (generalRegistrationResponse.getResCode().equals("0")) {
                 return generalRegistrationResponse;
-            }
-            else
+            } else
                 throw new BillPaymentException(generalRegistrationResponse.getDescription(), Integer.valueOf(generalRegistrationResponse.getResCode()), HttpStatus.BAD_REQUEST);
 
         } catch (ServiceUnavailableException e) {
             throw new ServiceUnavailableException("payment.request.unavailable");
-        } catch (WebClientRequestException eWeb){
+        } catch (WebClientRequestException eWeb) {
             throw new MyWebClientRequestException(eWeb.getMessage());
         }
 
@@ -79,14 +79,15 @@ public class SadadPspServiceImpl implements SadadPspService{
 
     /**
      * old method for verifying bill payment by psp
-     * @param token is psp token recieived by BillRequest call
+     *
+     * @param token    is psp token received by BillRequest call
      * @param signData
      * @param orderId
      * @return
      */
     @Override
     public PaymentVerificationResDto verifyInvoiceByPsp(String token, String signData, String orderId) {
-        RequestParamVO requestParamVo = RequestParamVO.of(token, signData ,orderId);
+        RequestParamVO requestParamVo = RequestParamVO.of(token, signData, orderId);
 
         GeneralVerificationResponse generalVerificationResponse = verifyInvoiceWebClient.doCallService(
                 requestParamVo,
@@ -108,6 +109,7 @@ public class SadadPspServiceImpl implements SadadPspService{
 
     /**
      * sends request to ipg for bill payment and gets psp token
+     *
      * @param ipgPaymentRequestReqDto
      * @param oauthToken
      * @return
@@ -141,6 +143,7 @@ public class SadadPspServiceImpl implements SadadPspService{
 
     /**
      * verifies bill payment through ipg
+     *
      * @param ipgVerifyReqDto Dto for sending request to verify payment
      * @return
      */
@@ -176,21 +179,6 @@ public class SadadPspServiceImpl implements SadadPspService{
 
         }
     }
-
-//    private GeneralVerificationResponse convertIpgVerifyResToGeneralVerifyRes(IPGVerifyResDto ipgVerifyResDto){
-//
-//        GeneralVerificationResponse generalVerifyRes = new GeneralVerificationResponse();
-//        generalVerifyRes.setAmount(ipgVerifyResDto.getAmount().toString());
-//        generalVerifyRes.setOrderId(ipgVerifyResDto.getOrderId().toString());
-//        generalVerifyRes.setCardNo(ipgVerifyResDto.getCardNo());
-//        generalVerifyRes.setDescription(ipgVerifyResDto.getDescription());
-//        generalVerifyRes.setHashedCardNo(ipgVerifyResDto.getHashedCardNo());
-//        generalVerifyRes.setResCode(ipgVerifyResDto.getResCode().toString());
-//        generalVerifyRes.setRetrivalRefNo(ipgVerifyResDto.getRetrievalRefNo());
-//        generalVerifyRes.setSwitchResCode(ipgVerifyResDto.getSwitchResCode());
-//        generalVerifyRes.setSystemTraceNo(ipgVerifyResDto.getSystemTraceNo());
-//        return  generalVerifyRes;
-//    }
 
     private static PaymentVerificationResDto convertIpgVerifyResToPaymentVerifyRes(IPGVerifyResDto response) {
         return PaymentVerificationResDto.builder()
