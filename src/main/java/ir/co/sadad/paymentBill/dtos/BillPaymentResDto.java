@@ -1,7 +1,7 @@
 package ir.co.sadad.paymentBill.dtos;
 
-import lombok.Getter;
-import lombok.Setter;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
 
 /**
  * using for response of bill request after getting token through psp.
@@ -9,11 +9,13 @@ import lombok.Setter;
  *
  * @author g.shahrokhabadi
  */
-@Setter
-@Getter
-public class InvoiceVerifyReqDto {
+@Data
+public class BillPaymentResDto {
 
+    @Schema(title = "توکن دریافتی از psp")
     private String token;
+
+    @Schema(title = "شماره سفارش قبض")
     private String orderId;
 
 }

@@ -27,7 +27,7 @@ class InvoicePaymentServiceImplTest extends PaymentBillApiApplicationTests {
     @MockBean
     BasicWebClient<IPGVerifyReqDto, IPGVerifyResDto> ipgVerifyWebClient;
 
-    private InvoicePaymentReqDto invoicePaymentReqDto;
+    private BillPaymentReqDto billPaymentReqDto;
     private FinalBillPaymentReqDto finalBillPaymentReqDto;
     private BillInquiryReqDto billInquiryReqDto;
 
@@ -35,10 +35,10 @@ class InvoicePaymentServiceImplTest extends PaymentBillApiApplicationTests {
 /////////////////////////// billPaymentByIpg method /////////////////////////////
     @Test
     void shouldReturnValidationErrorByBillPaymentByIpg(){
-        invoicePaymentReqDto = new InvoicePaymentReqDto();
-        invoicePaymentReqDto.setAmount("262000");
-        invoicePaymentReqDto.setInvoiceNumber("433768073015511");
-        invoicePaymentReqDto.setPaymentNumber("26206938");
+        billPaymentReqDto = new BillPaymentReqDto();
+        billPaymentReqDto.setAmount("262000");
+        billPaymentReqDto.setInvoiceNumber("433768073015511");
+        billPaymentReqDto.setPaymentNumber("26206938");
 
 //        boolean violations = validator.isValid(invoicePaymentReqDto , new ConstraintValidatorContextImpl(null,null,null,null,null,null));
 
@@ -48,21 +48,21 @@ class InvoicePaymentServiceImplTest extends PaymentBillApiApplicationTests {
 
     @Test
     void shouldThrowExceptionForPaidRecordByBillPaymentByIpg(){
-        invoicePaymentReqDto = new InvoicePaymentReqDto();
-        invoicePaymentReqDto.setAmount("262000");
-        invoicePaymentReqDto.setInvoiceNumber("4337680730155");
-        invoicePaymentReqDto.setPaymentNumber("0000026206938");
+        billPaymentReqDto = new BillPaymentReqDto();
+        billPaymentReqDto.setAmount("262000");
+        billPaymentReqDto.setInvoiceNumber("4337680730155");
+        billPaymentReqDto.setPaymentNumber("0000026206938");
 
-        assertThrows(CodedException.class, () -> service.BillPaymentByIpg(invoicePaymentReqDto, userVO, authToken));
+        assertThrows(CodedException.class, () -> service.BillPaymentByIpg(billPaymentReqDto, userVO, authToken));
 
     }
 
     @Test
     void shouldReturnTrueByBillPaymentByIpg() {
-        invoicePaymentReqDto = new InvoicePaymentReqDto();
-        invoicePaymentReqDto.setAmount("262000");
-        invoicePaymentReqDto.setInvoiceNumber("4337680730155");
-        invoicePaymentReqDto.setPaymentNumber("26206938");
+        billPaymentReqDto = new BillPaymentReqDto();
+        billPaymentReqDto.setAmount("262000");
+        billPaymentReqDto.setInvoiceNumber("4337680730155");
+        billPaymentReqDto.setPaymentNumber("26206938");
 
         IPGPaymentRequestResDto pspRes = new IPGPaymentRequestResDto();
         pspRes.setMerchantId("aaa");
@@ -71,7 +71,7 @@ class InvoicePaymentServiceImplTest extends PaymentBillApiApplicationTests {
         pspRes.setTerminalId("123");
         when(ipgRequestWebClient.doCallService(any(), any(), any(), any())).thenReturn(pspRes);
 
-        InvoiceVerifyReqDto billPaymentResDto = service.BillPaymentByIpg(invoicePaymentReqDto, userVO, authToken);
+        BillPaymentResDto billPaymentResDto = service.BillPaymentByIpg(billPaymentReqDto, userVO, authToken);
 
         assertEquals(pspRes.getToken(), billPaymentResDto.getToken());
 

@@ -37,7 +37,7 @@ import java.util.ResourceBundle;
 import static ir.co.sadad.paymentBill.Constants.PAYMENT_BILL_SERVICE_TYPE;
 
 /**
- * a service to handle payments by psp directly, via ipg and inquiry the  bill info.
+ * a service to handle payments by psp directly, via ipg and inquiry the bill info.
  *
  * @author g.shahrokhabadi
  */
@@ -73,14 +73,14 @@ public class InvoicePaymentServiceImpl implements InvoicePaymentService {
     /**
      * old method to get token of psp and registers invoice details in tables(if not exist)
      *
-     * @param invoicePaymentReqDto
+     * @param billPaymentReqDto
      * @return
      */
     @SneakyThrows
     @Override
-    public InvoiceVerifyReqDto invoiceRegister(InvoicePaymentReqDto invoicePaymentReqDto) {
+    public BillPaymentResDto invoiceRegister(BillPaymentReqDto billPaymentReqDto) {
 
-        Invoice savedInvoice = invoiceCreation(invoicePaymentReqDto, UserVO.of(userId, cellPhone, serialId));
+        Invoice savedInvoice = invoiceCreation(billPaymentReqDto, UserVO.of(userId, cellPhone, serialId));
 
         PspInvoiceRegistrationReqDto pspInvoiceRegistrationReqDto = prepareInvoiceRegistration(savedInvoice);
 
@@ -90,7 +90,7 @@ public class InvoicePaymentServiceImpl implements InvoicePaymentService {
 
         String token = processGetTokenResponse(generalRegistrationResponse);
 
-        InvoiceVerifyReqDto verifyResponse = new InvoiceVerifyReqDto();
+        BillPaymentResDto verifyResponse = new BillPaymentResDto();
         verifyResponse.setOrderId(String.valueOf(savedInvoice.getOrderId()));
         verifyResponse.setToken(token);
         return verifyResponse;
@@ -117,20 +117,20 @@ public class InvoicePaymentServiceImpl implements InvoicePaymentService {
     /**
      * takes token of psp through ipg services
      *
-     * @param invoicePaymentReqDto
+     * @param billPaymentReqDto
      * @param userVo
      * @param authToken
      * @return pspToken and orderId
      */
     @SneakyThrows
     @Override
-    public InvoiceVerifyReqDto BillPaymentByIpg(InvoicePaymentReqDto invoicePaymentReqDto, UserVO userVo, String authToken) {
+    public BillPaymentResDto BillPaymentByIpg(BillPaymentReqDto billPaymentReqDto, UserVO userVo, String authToken) {
 
-        Invoice savedInvoice = invoiceCreation(invoicePaymentReqDto, userVo);
+        Invoice savedInvoice = invoiceCreation(billPaymentReqDto, userVo);
 
-        String pspToken = sadadPspService.requestPaymentByIpg(makeIpgPaymentRequest(savedInvoice, invoicePaymentReqDto, userVo), authToken);
+        String pspToken = sadadPspService.requestPaymentByIpg(makeIpgPaymentRequest(savedInvoice, billPaymentReqDto, userVo), authToken);
 
-        InvoiceVerifyReqDto billPaymentResDto = new InvoiceVerifyReqDto();
+        BillPaymentResDto billPaymentResDto = new BillPaymentResDto();
         billPaymentResDto.setToken(pspToken);
         billPaymentResDto.setOrderId(savedInvoice.getOrderId().toString());
         return billPaymentResDto;
@@ -145,7 +145,7 @@ public class InvoicePaymentServiceImpl implements InvoicePaymentService {
      */
     @Override
     public FinalBillPaymentResDto finalBillPaymentByIpg(FinalBillPaymentReqDto finalBillPaymentReqDto) {
-        //TODO: must be Validate before
+
         Optional<Invoice> checkResult = invoiceRepository.findByOrderId(Long.valueOf(finalBillPaymentReqDto.getRequestId()));
         Invoice singleResult = checkResult.orElseThrow(() -> new BillPaymentException("bill.is.not.exist.by.order.id", HttpStatus.BAD_REQUEST));
 
@@ -194,16 +194,16 @@ public class InvoicePaymentServiceImpl implements InvoicePaymentService {
 
     }
 
-    private IPGPaymentRequestReqDto makeIpgPaymentRequest(Invoice savedinvoice, InvoicePaymentReqDto invoicePaymentReqDto, UserVO user) {
+    private IPGPaymentRequestReqDto makeIpgPaymentRequest(Invoice savedinvoice, BillPaymentReqDto billPaymentReqDto, UserVO user) {
         IPGPaymentRequestReqDto req = new IPGPaymentRequestReqDto();
-        req.setAmount(Long.valueOf(invoicePaymentReqDto.getAmount()));
+        req.setAmount(Long.valueOf(billPaymentReqDto.getAmount()));
         req.setServiceType(PAYMENT_BILL_SERVICE_TYPE);
         req.setRequestId(savedinvoice.getOrderId().toString());
         req.setUserDeviceId(user.getSerialId());
         req.setUserId(user.getUserId());
         req.setSsn(user.getSsn());
-        req.setInvoiceNumber(invoicePaymentReqDto.getInvoiceNumber());
-        req.setPaymentNumber(invoicePaymentReqDto.getPaymentNumber());
+        req.setInvoiceNumber(billPaymentReqDto.getInvoiceNumber());
+        req.setPaymentNumber(billPaymentReqDto.getPaymentNumber());
         return req;
     }
 
@@ -216,9 +216,9 @@ public class InvoicePaymentServiceImpl implements InvoicePaymentService {
         return ipgVerifyReq;
     }
 
-    private Invoice invoiceCreation(InvoicePaymentReqDto invoicePaymentReqDto, UserVO userVo) {
-        Optional<Invoice> invoice = invoiceRepository.findByInvoiceNumberAndPaymentNumber(invoicePaymentReqDto.getInvoiceNumber(), invoicePaymentReqDto.getPaymentNumber());
-        Invoice savedInvoice = invoice.orElseGet(() -> makeNewInvoice(invoicePaymentReqDto, userVo));
+    private Invoice invoiceCreation(BillPaymentReqDto billPaymentReqDto, UserVO userVo) {
+        Optional<Invoice> invoice = invoiceRepository.findByInvoiceNumberAndPaymentNumber(billPaymentReqDto.getInvoiceNumber(), billPaymentReqDto.getPaymentNumber());
+        Invoice savedInvoice = invoice.orElseGet(() -> makeNewInvoice(billPaymentReqDto, userVo));
 
         if (savedInvoice.getPaymentStatus().equals(PaymentStatus.PAID)) {
             throw new BillPaymentException("bill.is.paid", HttpStatus.BAD_REQUEST);
@@ -228,8 +228,8 @@ public class InvoicePaymentServiceImpl implements InvoicePaymentService {
         Payee savedPayee = payee.orElseGet(() -> new Payee(userVo.getUserMobileNo()));
         payeeRepository.saveAndFlush(savedPayee);
 
-        Optional<PayRequest> payRequest = payRequestRepository.findByPayeeAndChannel(savedPayee, Channel.HAM_BAAM);
-        PayRequest savedPayReq = payRequest.orElseGet(() -> new PayRequest(savedPayee, Channel.HAM_BAAM, null));
+        Optional<PayRequest> payRequest = payRequestRepository.findByPayeeAndChannel(savedPayee, Channel.BAM_PAY);
+        PayRequest savedPayReq = payRequest.orElseGet(() -> new PayRequest(savedPayee, Channel.BAM_PAY, null));
         payRequestRepository.saveAndFlush(savedPayReq);
 
         Optional<PayRequestInvoice> payReqInvoice = payRequestInvoiceRepository.findByPayRequestIdAndInvoiceId(savedPayReq.getId(), savedInvoice.getId());
@@ -240,14 +240,14 @@ public class InvoicePaymentServiceImpl implements InvoicePaymentService {
         return savedInvoice;
     }
 
-    private Invoice makeNewInvoice(InvoicePaymentReqDto invoicePaymentReqDto, UserVO userVo) {
-        InvoiceType invoiceType = InvoiceType.getEnum(Integer.parseInt(invoicePaymentReqDto.getInvoiceNumber().substring(invoicePaymentReqDto.getInvoiceNumber().length() - 2, invoicePaymentReqDto.getInvoiceNumber().length() - 1)));
+    private Invoice makeNewInvoice(BillPaymentReqDto billPaymentReqDto, UserVO userVo) {
+        InvoiceType invoiceType = InvoiceType.getEnum(Integer.parseInt(billPaymentReqDto.getInvoiceNumber().substring(billPaymentReqDto.getInvoiceNumber().length() - 2, billPaymentReqDto.getInvoiceNumber().length() - 1)));
 
         Invoice savedInvoice = new Invoice();
-        savedInvoice.setInvoiceNumber(invoicePaymentReqDto.getInvoiceNumber());
-        savedInvoice.setPaymentNumber(invoicePaymentReqDto.getPaymentNumber());
+        savedInvoice.setInvoiceNumber(billPaymentReqDto.getInvoiceNumber());
+        savedInvoice.setPaymentNumber(billPaymentReqDto.getPaymentNumber());
         savedInvoice.setInvoiceType(invoiceType);
-        savedInvoice.setAmount(new BigDecimal(invoicePaymentReqDto.getAmount()));
+        savedInvoice.setAmount(new BigDecimal(billPaymentReqDto.getAmount()));
         savedInvoice.setServiceMethod(ServiceMethod.BY_CARD);
         savedInvoice.setPaymentStatus(PaymentStatus.INCONCLUSIVE);
         savedInvoice.setChannel(Channel.HAM_BAAM);

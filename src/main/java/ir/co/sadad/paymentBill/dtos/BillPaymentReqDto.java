@@ -11,7 +11,7 @@ import javax.validation.constraints.NotBlank;
  * @author g.shahrokhabadi
  */
 @Data
-public class InvoicePaymentReqDto {
+public class BillPaymentReqDto {
     @Schema(title = " شماره قبض")
     @NotBlank
     private String invoiceNumber;

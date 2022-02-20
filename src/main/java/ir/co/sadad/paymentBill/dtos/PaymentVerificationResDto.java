@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 @Getter
 @Builder
 public class PaymentVerificationResDto {
+
     private Long orderId;
     private String referenceNo;
     private String traceNo;
@@ -18,15 +19,5 @@ public class PaymentVerificationResDto {
     private String hashedCardNo;
     private String cardNo;
 
-//    public PaymentVerificationResDto(Long orderId, String referenceNo, String traceNo, LocalDateTime transactionDate, String description, Integer statusCode, String hashedCardNo, String cardNo) {
-//        this.orderId = orderId;
-//        this.referenceNo = referenceNo;
-//        this.traceNo = traceNo;
-//        this.transactionDate = transactionDate;
-//        this.description = description;
-//        this.statusCode = statusCode;
-//        this.cardNo = cardNo;
-//        this.hashedCardNo = hashedCardNo;
-//    }
 
 }

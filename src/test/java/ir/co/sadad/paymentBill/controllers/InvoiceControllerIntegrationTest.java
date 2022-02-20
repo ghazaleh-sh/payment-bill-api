@@ -1,8 +1,8 @@
 package ir.co.sadad.paymentBill.controllers;
 
 import ir.co.sadad.paymentBill.dtos.BillInquiryReqDto;
-import ir.co.sadad.paymentBill.dtos.InvoicePaymentReqDto;
-import ir.co.sadad.paymentBill.dtos.InvoiceVerifyReqDto;
+import ir.co.sadad.paymentBill.dtos.BillPaymentReqDto;
+import ir.co.sadad.paymentBill.dtos.BillPaymentResDto;
 import ir.co.sadad.paymentBill.dtos.FinalBillPaymentReqDto;
 import ir.co.sadad.paymentBill.dtos.FinalBillPaymentResDto;
 import ir.co.sadad.paymentBill.enums.IpgVerificationStatus;
@@ -19,12 +19,12 @@ class InvoiceControllerIntegrationTest extends AbstractBaseIntegrationTest{
     @Test
     void shouldPassBillPaymentByIpg() {
 
-        InvoicePaymentReqDto paymentReqDto = new InvoicePaymentReqDto();
+        BillPaymentReqDto paymentReqDto = new BillPaymentReqDto();
         paymentReqDto.setAmount("1000");
         paymentReqDto.setPaymentNumber("106936");
         paymentReqDto.setInvoiceNumber("4337680730155");
 
-        InvoiceVerifyReqDto result = webTestClient
+        BillPaymentResDto result = webTestClient
                 .post()
                 .uri("/invoice/ipg-bill-payment")
                 .accept(MediaType.APPLICATION_JSON)
@@ -34,11 +34,11 @@ class InvoiceControllerIntegrationTest extends AbstractBaseIntegrationTest{
                 .header(SERIAL_ID, deviceId)
                 .header(CELL_PHONE, cellphone)
                 .header(SSN, ssn)
-                .body(Mono.just(paymentReqDto), InvoicePaymentReqDto.class)
+                .body(Mono.just(paymentReqDto), BillPaymentReqDto.class)
                 .exchange()
                 .expectStatus()
                 .isOk()
-                .expectBody(InvoiceVerifyReqDto.class)
+                .expectBody(BillPaymentResDto.class)
                 .returnResult()
                 .getResponseBody();
 
