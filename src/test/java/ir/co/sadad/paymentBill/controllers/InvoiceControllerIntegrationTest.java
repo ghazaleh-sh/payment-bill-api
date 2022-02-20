@@ -1,11 +1,10 @@
 package ir.co.sadad.paymentBill.controllers;
 
 import ir.co.sadad.paymentBill.dtos.BillInquiryReqDto;
-import ir.co.sadad.paymentBill.dtos.BillInquiryResDto;
 import ir.co.sadad.paymentBill.dtos.InvoicePaymentReqDto;
 import ir.co.sadad.paymentBill.dtos.InvoiceVerifyReqDto;
-import ir.co.sadad.paymentBill.dtos.ipg.FinalBillPaymentReqDto;
-import ir.co.sadad.paymentBill.dtos.ipg.FinalBillPaymentResDto;
+import ir.co.sadad.paymentBill.dtos.FinalBillPaymentReqDto;
+import ir.co.sadad.paymentBill.dtos.FinalBillPaymentResDto;
 import ir.co.sadad.paymentBill.enums.IpgVerificationStatus;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;

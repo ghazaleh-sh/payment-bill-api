@@ -1,11 +1,7 @@
 package ir.co.sadad.paymentBill.services;
 
 import ir.co.sadad.paymentBill.PaymentBillApiApplicationTests;
-import ir.co.sadad.paymentBill.dtos.BillInquiryReqDto;
-import ir.co.sadad.paymentBill.dtos.BillInquiryResDto;
-import ir.co.sadad.paymentBill.dtos.InvoicePaymentReqDto;
-import ir.co.sadad.paymentBill.dtos.InvoiceVerifyReqDto;
-import ir.co.sadad.paymentBill.dtos.ipg.*;
+import ir.co.sadad.paymentBill.dtos.*;
 import ir.co.sadad.paymentBill.enums.IpgVerificationStatus;
 import ir.co.sadad.paymentBill.exceptions.BillPaymentException;
 import ir.co.sadad.paymentBill.exceptions.CodedException;

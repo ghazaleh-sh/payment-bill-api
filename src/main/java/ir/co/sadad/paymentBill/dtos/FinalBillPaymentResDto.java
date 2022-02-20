@@ -1,4 +1,4 @@
-package ir.co.sadad.paymentBill.dtos.ipg;
+package ir.co.sadad.paymentBill.dtos;
 
 
 import ir.co.sadad.paymentBill.enums.IpgVerificationStatus;

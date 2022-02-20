@@ -2,10 +2,10 @@ package ir.co.sadad.paymentBill.services;
 
 import ir.co.sadad.paymentBill.UserVO;
 import ir.co.sadad.paymentBill.dtos.*;
-import ir.co.sadad.paymentBill.dtos.ipg.FinalBillPaymentReqDto;
-import ir.co.sadad.paymentBill.dtos.ipg.FinalBillPaymentResDto;
-import ir.co.sadad.paymentBill.dtos.ipg.IPGPaymentRequestReqDto;
-import ir.co.sadad.paymentBill.dtos.ipg.IPGVerifyReqDto;
+import ir.co.sadad.paymentBill.dtos.FinalBillPaymentReqDto;
+import ir.co.sadad.paymentBill.dtos.FinalBillPaymentResDto;
+import ir.co.sadad.paymentBill.dtos.IPGPaymentRequestReqDto;
+import ir.co.sadad.paymentBill.dtos.IPGVerifyReqDto;
 import ir.co.sadad.paymentBill.dtos.PaymentVerificationResDto;
 import ir.co.sadad.paymentBill.entities.Invoice;
 import ir.co.sadad.paymentBill.entities.PayRequest;
@@ -287,6 +287,7 @@ public class InvoicePaymentServiceImpl implements InvoicePaymentService {
         existingInvoice.setHashedCardNo(transactionInfoRes.getHashedCardNo());
         existingInvoice.setTransactionDescription(transactionInfoRes.getDescription());
 
+        log.info("invoice table updated transaction successfully after verifying ....");
         return invoiceRepository.saveAndFlush(existingInvoice);
     }
 
