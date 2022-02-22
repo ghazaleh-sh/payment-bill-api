@@ -1,9 +1,6 @@
 package ir.co.sadad.paymentBill.controllers;
 
-import ir.co.sadad.paymentBill.exceptions.BillPaymentException;
-import ir.co.sadad.paymentBill.exceptions.GlobalErrorResponse;
-import ir.co.sadad.paymentBill.exceptions.ServiceUnavailableException;
-import ir.co.sadad.paymentBill.exceptions.MyWebClientRequestException;
+import ir.co.sadad.paymentBill.exceptions.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.exception.JDBCConnectionException;
@@ -18,6 +15,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import javax.validation.ConstraintViolationException;
+import javax.validation.ValidationException;
 import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -163,7 +161,7 @@ public class AppErrorAdvice {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<GlobalErrorResponse> handleValidationExceptions(MethodArgumentNotValidException ex) {
 
-        log.warn("validation exception", ex);
+        log.warn("Method Argument Not Valid exception", ex);
 
         List<GlobalErrorResponse.SubError> subErrorList = new ArrayList<>();
         ex.getBindingResult().getAllErrors().forEach((error) -> {
@@ -183,6 +181,19 @@ public class AppErrorAdvice {
                 .setSubErrors(subErrorList);
         return new ResponseEntity<>(globalErrorResponse, HttpStatus.BAD_REQUEST);
 
+    }
+
+    @ExceptionHandler(ValidationException.class)
+    public ResponseEntity<GlobalErrorResponse> handleValidationExceptions(ValidationException ex) {
+        log.warn("validation exception", ex);
+
+        GlobalErrorResponse globalErrorResponse = new GlobalErrorResponse();
+        globalErrorResponse
+                .setStatus(HttpStatus.BAD_REQUEST)
+                .setTimestamp(new Date().getTime())
+                .setCode("E" + HttpStatus.BAD_REQUEST.value() + ERROR_CODE_TAIL)
+                .setLocalizedMessage(messageSource.getMessage("method.argument.not.valid", null, new Locale("fa")));
+        return new ResponseEntity<>(globalErrorResponse, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)

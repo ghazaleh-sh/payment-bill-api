@@ -33,18 +33,6 @@ class InvoicePaymentServiceImplTest extends PaymentBillApiApplicationTests {
 
 
 /////////////////////////// billPaymentByIpg method /////////////////////////////
-    @Test
-    void shouldReturnValidationErrorByBillPaymentByIpg(){
-        billPaymentReqDto = new BillPaymentReqDto();
-        billPaymentReqDto.setAmount("262000");
-        billPaymentReqDto.setInvoiceNumber("433768073015511");
-        billPaymentReqDto.setPaymentNumber("26206938");
-
-//        boolean violations = validator.isValid(invoicePaymentReqDto , new ConstraintValidatorContextImpl(null,null,null,null,null,null));
-
-//        assertThrows(BillPaymentException.class, validator.checkInvoiceValidation(invoicePaymentReqDto.getInvoiceNumber() , invoicePaymentReqDto.getPaymentNumber(), new BigDecimal(invoicePaymentReqDto.getAmount())));
-
-    }
 
     @Test
     void shouldThrowExceptionForPaidRecordByBillPaymentByIpg(){
@@ -53,7 +41,7 @@ class InvoicePaymentServiceImplTest extends PaymentBillApiApplicationTests {
         billPaymentReqDto.setInvoiceNumber("4337680730155");
         billPaymentReqDto.setPaymentNumber("0000026206938");
 
-        assertThrows(CodedException.class, () -> service.BillPaymentByIpg(billPaymentReqDto, userVO, authToken));
+        assertThrows(BillPaymentException.class, () -> service.BillPaymentByIpg(billPaymentReqDto, userVO, authToken));
 
     }
 
