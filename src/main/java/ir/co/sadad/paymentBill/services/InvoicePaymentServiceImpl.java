@@ -111,7 +111,7 @@ public class InvoicePaymentServiceImpl implements InvoicePaymentService {
         }
         String base64SignedData = encoder.prepareSignDataWithToken(token);
         PaymentVerificationResDto paymentVerificationResDto = sadadPspService.verifyInvoiceByPsp(token, base64SignedData, orderId);
-        return updateTransactionInfo(paymentVerificationResDto);
+        return updateTransactionInfo(paymentVerificationResDto, null, null);
     }
 
     /**
@@ -152,12 +152,12 @@ public class InvoicePaymentServiceImpl implements InvoicePaymentService {
         if (singleResult.getPaymentStatus().equals(PaymentStatus.PAID))
             throw new BillPaymentException("bill.is.paid", HttpStatus.BAD_REQUEST);
 
-        if (!finalBillPaymentReqDto.getUserId().equals(singleResult.getUserId()))
-            throw new BillPaymentException("userId.is.not.the.same", HttpStatus.BAD_REQUEST);
+//        if (!finalBillPaymentReqDto.getUserId().equals(singleResult.getUserId()))
+//            throw new BillPaymentException("userId.is.not.the.same", HttpStatus.BAD_REQUEST);
 
         PaymentVerificationResDto paymentVerifyRes = sadadPspService.verifyBillPaymentByIpg(makeIpgVerifyRequest(finalBillPaymentReqDto));
 
-        updateTransactionInfo(paymentVerifyRes);
+        updateTransactionInfo(paymentVerifyRes, finalBillPaymentReqDto.getUserId(), finalBillPaymentReqDto.getUserDeviceId());
 
         FinalBillPaymentResDto finalResponse = new FinalBillPaymentResDto();
         finalResponse.setStatus(IpgVerificationStatus.SUCCESSFUL);
@@ -272,7 +272,7 @@ public class InvoicePaymentServiceImpl implements InvoicePaymentService {
                 .build();
     }
 
-    private Invoice updateTransactionInfo(PaymentVerificationResDto transactionInfoRes) {
+    private Invoice updateTransactionInfo(PaymentVerificationResDto transactionInfoRes, String userId, String deviceId) {
         Optional<Invoice> checkInvoice = invoiceRepository.findByOrderId(transactionInfoRes.getOrderId());
         Invoice existingInvoice = checkInvoice.orElseThrow(() -> new BillPaymentException("bill.is.not.exist.by.order.id", HttpStatus.BAD_REQUEST));
 
@@ -286,8 +286,10 @@ public class InvoicePaymentServiceImpl implements InvoicePaymentService {
         existingInvoice.setCardNo(transactionInfoRes.getCardNo());
         existingInvoice.setHashedCardNo(transactionInfoRes.getHashedCardNo());
         existingInvoice.setTransactionDescription(transactionInfoRes.getDescription());
+        existingInvoice.setUserId(userId);
+        existingInvoice.setDeviceSerialId(deviceId);
 
-        log.info("invoice table updated transaction successfully after verifying ....");
+        log.info("invoice table updated successfully after verifying process....");
         return invoiceRepository.saveAndFlush(existingInvoice);
     }
 

@@ -24,11 +24,4 @@ public class BillPaymentReqDto {
     @NotBlank
     private String amount;
 
-//
-//    public boolean isEmpty() {
-//        if (this.invoiceNumber == null && this.paymentNumber == null && this.amount == null)
-//            return true;
-//        else return false;
-//    }
-
 }

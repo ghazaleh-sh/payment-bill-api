@@ -94,7 +94,7 @@ class InvoicePaymentServiceImplTest extends PaymentBillApiApplicationTests {
     @Test
     void shouldReturnTrueByFinalBillPaymentByIpg() {
         finalBillPaymentReqDto = new FinalBillPaymentReqDto();
-        finalBillPaymentReqDto.setRequestId("1637991304096");
+        finalBillPaymentReqDto.setRequestId("1637649541535");
         finalBillPaymentReqDto.setToken("20");
         finalBillPaymentReqDto.setUserId(userVO.getUserId());
         finalBillPaymentReqDto.setUserDeviceId(userVO.getSerialId());

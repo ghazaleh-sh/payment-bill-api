@@ -63,7 +63,7 @@ public class InvoiceController {
             @RequestHeader(SERIAL_ID) String serialId,
             @RequestHeader(CELL_PHONE) String cellPhone,
             @RequestHeader(SSN) String ssn,
-            @InvoiceValid @RequestBody BillPaymentReqDto billPaymentReqDto) {
+            @InvoiceValid @Valid @RequestBody BillPaymentReqDto billPaymentReqDto) {
 
         BillPaymentResDto billPaymentResDto = invoicePaymentService.BillPaymentByIpg(billPaymentReqDto, UserVO.of(userId, cellPhone, serialId, ssn), authToken);
 

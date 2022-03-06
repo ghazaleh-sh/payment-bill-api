@@ -25,20 +25,6 @@ public class Invoice implements Serializable {
     public Invoice() {
     }
 
-//    public Invoice(String invoiceNumber, String paymentNumber, InvoiceType invoiceType, BigDecimal amount, ServiceMethod serviceMethod, PaymentStatus paymentStatus, Channel channel, String userId, String deviceSerialId) {
-//        this.invoiceType = invoiceType;
-//        this.amount = amount;
-//        this.paymentStatus = paymentStatus;
-//        this.serviceMethod = serviceMethod;
-//        this.channel = channel;
-//        this.creationDateTime = new Timestamp(DateTime.now().getMillis());
-//        this.orderId = DateTime.now().getMillis();
-//        this.invoiceNumber = invoiceNumber;
-//        this.paymentNumber = paymentNumber;
-//        this.userId = userId;
-//        this.deviceSerialId = deviceSerialId;
-//    }
-
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ID")
     private Long id;
