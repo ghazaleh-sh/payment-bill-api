@@ -16,7 +16,7 @@ public class PaymentBillApiApplicationTests {
 //	protected InvoiceValidator validator;
 
 	protected String authToken = "accessToken";
-	private String userId = "158";
+	private String userId =  "158";
 	private String ssn = "0079993141";
 	private String cellphone = "9124150188";
 	private String deviceId = "5700cd58-3cd6-4ce3-81ff-ee519e1f6df7";
