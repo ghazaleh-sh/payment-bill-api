@@ -9,6 +9,7 @@ import java.io.Serializable;
 @Setter
 @Getter
 public abstract class RegisterDto implements Serializable {
+    private static final long serialVersionUID = -8347814356235906867L;
     @JsonProperty("MerchantId")
     protected String merchantId;
     @JsonProperty("TerminalId")

@@ -7,8 +7,9 @@ import java.util.Map;
 @Getter
 public abstract class BaseException extends RuntimeException {
 
+    private static final long serialVersionUID = -6899174729884261236L;
     protected String code;
-    private HttpStatus httpStatusCode;
+    private final HttpStatus httpStatusCode;
     private Map<String, Object> messageArgs;
 
     public BaseException() {

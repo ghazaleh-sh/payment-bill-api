@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @ResponseStatus(value = HttpStatus.SERVICE_UNAVAILABLE)
 public final class ServiceUnavailableException extends BaseException {
 
+    private static final long serialVersionUID = -631520219029721301L;
+
     public ServiceUnavailableException(String messageCode) {
         this.code = messageCode;
     }

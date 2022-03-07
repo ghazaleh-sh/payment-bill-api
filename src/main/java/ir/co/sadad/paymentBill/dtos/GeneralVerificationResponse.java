@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
+
 
 /**
  * dto for response of psp after verification
@@ -12,25 +14,26 @@ import lombok.Setter;
  */
 @Setter
 @Getter
-public class GeneralVerificationResponse {
+public class GeneralVerificationResponse implements Serializable {
 
+    private static final long serialVersionUID = 5552640496595186952L;
     @JsonProperty("ResCode")
-    protected String resCode;
+    private String resCode;
     @JsonProperty("Amount")
-    protected String amount;
+    private String amount;
     @JsonProperty("Description")
-    protected String description;
+    private String description;
     @JsonProperty("RetrivalRefNo")
-    protected String retrivalRefNo;
+    private String retrivalRefNo;
     @JsonProperty("SystemTraceNo")
-    protected String systemTraceNo;
+    private String systemTraceNo;
     @JsonProperty("OrderId")
-    protected String orderId;
+    private String orderId;
     @JsonProperty("SwitchResCode")
-    protected String switchResCode;
+    private String switchResCode;
     @JsonProperty("HashedCardNo")
-    protected String hashedCardNo;
+    private String hashedCardNo;
     @JsonProperty("CardNo")
-    protected String cardNo;
+    private String cardNo;
 
 }

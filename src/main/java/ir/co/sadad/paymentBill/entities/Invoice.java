@@ -22,6 +22,8 @@ import java.util.Collection;
 @IdClass(InvoicePk.class)
 public class Invoice implements Serializable {
 
+    private static final long serialVersionUID = 369718894750463303L;
+
     public Invoice() {
     }
 

@@ -1,4 +1,4 @@
-package ir.co.sadad.paymentBill;
+package ir.co.sadad.paymentBill.commons;
 
 public interface Constants {
 

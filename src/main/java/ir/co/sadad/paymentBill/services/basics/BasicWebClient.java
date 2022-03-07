@@ -1,6 +1,6 @@
 package ir.co.sadad.paymentBill.services.basics;
 
-import ir.co.sadad.paymentBill.RequestParamVO;
+import ir.co.sadad.paymentBill.commons.RequestParamVO;
 import ir.co.sadad.paymentBill.exceptions.BillPaymentException;
 import ir.co.sadad.paymentBill.exceptions.GlobalErrorResponse;
 import ir.co.sadad.paymentBill.exceptions.ServiceUnavailableException;

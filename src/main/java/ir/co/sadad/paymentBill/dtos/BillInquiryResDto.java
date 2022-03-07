@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 /**
@@ -17,8 +18,9 @@ import java.math.BigDecimal;
 @Getter
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class BillInquiryResDto {
+public class BillInquiryResDto implements Serializable {
 
+    private static final long serialVersionUID = -4485399547900796741L;
     private Long orderId;
 
     private String invoiceNumber;

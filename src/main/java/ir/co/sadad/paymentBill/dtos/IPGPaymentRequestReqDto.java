@@ -3,6 +3,8 @@ package ir.co.sadad.paymentBill.dtos;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
+
 /**
  * request dto of ipg for payment request Token
  *
@@ -11,7 +13,8 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class IPGPaymentRequestReqDto {
+public class IPGPaymentRequestReqDto implements Serializable {
+    private static final long serialVersionUID = 1413114498875202085L;
     /**
      * userId which is extracted from oauth token
      */

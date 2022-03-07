@@ -3,6 +3,8 @@ package ir.co.sadad.paymentBill.dtos;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import java.io.Serializable;
+
 /**
  * this dto will come from body request of ipg service
  *
@@ -10,8 +12,9 @@ import lombok.Data;
  */
 
 @Data
-public class FinalBillPaymentReqDto {
+public class FinalBillPaymentReqDto implements Serializable {
 
+    private static final long serialVersionUID = -3908148881558742932L;
     /**
      * extracted from oauth token when calling ipg-payment-request service and saved in transaction table
      */

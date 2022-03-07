@@ -3,7 +3,7 @@ package ir.co.sadad.paymentBill.controllers;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import ir.bmi.identity.security.interceptor.Scope;
-import ir.co.sadad.paymentBill.UserVO;
+import ir.co.sadad.paymentBill.commons.UserVO;
 import ir.co.sadad.paymentBill.dtos.BillInquiryReqDto;
 import ir.co.sadad.paymentBill.dtos.BillInquiryResDto;
 import ir.co.sadad.paymentBill.dtos.BillPaymentReqDto;
@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
-import static ir.co.sadad.paymentBill.Constants.*;
+import static ir.co.sadad.paymentBill.commons.Constants.*;
 
 @Slf4j
 @RequiredArgsConstructor

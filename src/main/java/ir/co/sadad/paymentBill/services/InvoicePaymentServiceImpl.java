@@ -1,6 +1,6 @@
 package ir.co.sadad.paymentBill.services;
 
-import ir.co.sadad.paymentBill.UserVO;
+import ir.co.sadad.paymentBill.commons.UserVO;
 import ir.co.sadad.paymentBill.dtos.*;
 import ir.co.sadad.paymentBill.dtos.FinalBillPaymentReqDto;
 import ir.co.sadad.paymentBill.dtos.FinalBillPaymentResDto;
@@ -34,7 +34,7 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
-import static ir.co.sadad.paymentBill.Constants.PAYMENT_BILL_SERVICE_TYPE;
+import static ir.co.sadad.paymentBill.commons.Constants.PAYMENT_BILL_SERVICE_TYPE;
 
 /**
  * a service to handle payments by psp directly, via ipg and inquiry the bill info.
@@ -54,13 +54,13 @@ public class InvoicePaymentServiceImpl implements InvoicePaymentService {
     private final SadadPspService sadadPspService;
 
     @Value(value = "${invoice.terminalId}")
-    String terminalId;
+    private String terminalId;
 
     @Value(value = "${invoice.merchantId}")
-    String merchantId;
+    private String merchantId;
 
     @Value(value = "${invoice.returnUrl}")
-    String returnUrl;
+    private String returnUrl;
 
     @Value(value = "${old-registration.userId}")
     private String userId;
@@ -101,17 +101,20 @@ public class InvoicePaymentServiceImpl implements InvoicePaymentService {
      *
      * @param token
      * @param orderId
-     * @return
      */
     @Override
-    public Invoice verifyInvoicePayment(String token, String orderId) {
+    public void verifyInvoicePayment(String token, String orderId) {
 
         if (token == null || token.isEmpty()) {
             throw new CodedException(ExceptionType.IllegalArgumentCoddedException, "E400005", "EINP40010009");
         }
+
+        Optional<Invoice> checkResult = invoiceRepository.findByOrderId(Long.valueOf(orderId));
+        Invoice singleResult = checkResult.orElseThrow(() -> new BillPaymentException("bill.is.not.exist.by.order.id", HttpStatus.BAD_REQUEST));
+
         String base64SignedData = encoder.prepareSignDataWithToken(token);
         PaymentVerificationResDto paymentVerificationResDto = sadadPspService.verifyInvoiceByPsp(token, base64SignedData, orderId);
-        return updateTransactionInfo(paymentVerificationResDto, null, null);
+        updateTransactionInfo(singleResult, paymentVerificationResDto, singleResult.getUserId(), singleResult.getDeviceSerialId());
     }
 
     /**
@@ -152,12 +155,9 @@ public class InvoicePaymentServiceImpl implements InvoicePaymentService {
         if (singleResult.getPaymentStatus().equals(PaymentStatus.PAID))
             throw new BillPaymentException("bill.is.paid", HttpStatus.BAD_REQUEST);
 
-//        if (!finalBillPaymentReqDto.getUserId().equals(singleResult.getUserId()))
-//            throw new BillPaymentException("userId.is.not.the.same", HttpStatus.BAD_REQUEST);
-
         PaymentVerificationResDto paymentVerifyRes = sadadPspService.verifyBillPaymentByIpg(makeIpgVerifyRequest(finalBillPaymentReqDto));
 
-        updateTransactionInfo(paymentVerifyRes, finalBillPaymentReqDto.getUserId(), finalBillPaymentReqDto.getUserDeviceId());
+        updateTransactionInfo(singleResult, paymentVerifyRes, finalBillPaymentReqDto.getUserId(), finalBillPaymentReqDto.getUserDeviceId());
 
         FinalBillPaymentResDto finalResponse = new FinalBillPaymentResDto();
         finalResponse.setStatus(IpgVerificationStatus.SUCCESSFUL);
@@ -228,8 +228,8 @@ public class InvoicePaymentServiceImpl implements InvoicePaymentService {
         Payee savedPayee = payee.orElseGet(() -> new Payee(userVo.getUserMobileNo()));
         payeeRepository.saveAndFlush(savedPayee);
 
-        Optional<PayRequest> payRequest = payRequestRepository.findByPayeeAndChannel(savedPayee, Channel.BAM_PAY);
-        PayRequest savedPayReq = payRequest.orElseGet(() -> new PayRequest(savedPayee, Channel.BAM_PAY, null));
+        Optional<PayRequest> payRequest = payRequestRepository.findByPayeeAndChannel(savedPayee, Channel.BAAM_PAY);
+        PayRequest savedPayReq = payRequest.orElseGet(() -> new PayRequest(savedPayee, Channel.BAAM_PAY, null));
         payRequestRepository.saveAndFlush(savedPayReq);
 
         Optional<PayRequestInvoice> payReqInvoice = payRequestInvoiceRepository.findByPayRequestIdAndInvoiceId(savedPayReq.getId(), savedInvoice.getId());
@@ -250,7 +250,7 @@ public class InvoicePaymentServiceImpl implements InvoicePaymentService {
         savedInvoice.setAmount(new BigDecimal(billPaymentReqDto.getAmount()));
         savedInvoice.setServiceMethod(ServiceMethod.BY_CARD);
         savedInvoice.setPaymentStatus(PaymentStatus.INCONCLUSIVE);
-        savedInvoice.setChannel(Channel.HAM_BAAM);
+        savedInvoice.setChannel(Channel.BAAM_PAY);
         savedInvoice.setDeviceSerialId(userVo.getSerialId());
         savedInvoice.setUserId(userVo.getUserId());
         savedInvoice.setOrderId(DateTime.now().getMillis());
@@ -272,9 +272,7 @@ public class InvoicePaymentServiceImpl implements InvoicePaymentService {
                 .build();
     }
 
-    private Invoice updateTransactionInfo(PaymentVerificationResDto transactionInfoRes, String userId, String deviceId) {
-        Optional<Invoice> checkInvoice = invoiceRepository.findByOrderId(transactionInfoRes.getOrderId());
-        Invoice existingInvoice = checkInvoice.orElseThrow(() -> new BillPaymentException("bill.is.not.exist.by.order.id", HttpStatus.BAD_REQUEST));
+    private void updateTransactionInfo(Invoice existingInvoice, PaymentVerificationResDto transactionInfoRes, String userId, String deviceId) {
 
         String status = transactionInfoRes.getStatusCode().equals(0) ? PaymentStatus.PAID.toString() : PaymentStatus.UNPAID.toString();
 
@@ -290,7 +288,7 @@ public class InvoicePaymentServiceImpl implements InvoicePaymentService {
         existingInvoice.setDeviceSerialId(deviceId);
 
         log.info("invoice table updated successfully after verifying process....");
-        return invoiceRepository.saveAndFlush(existingInvoice);
+        invoiceRepository.saveAndFlush(existingInvoice);
     }
 
     public static String processGetTokenResponse(GeneralRegistrationResponse generalRegistrationResponse) throws BillPaymentException {

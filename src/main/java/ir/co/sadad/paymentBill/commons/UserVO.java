@@ -1,4 +1,4 @@
-package ir.co.sadad.paymentBill;
+package ir.co.sadad.paymentBill.commons;
 
 import ir.co.sadad.paymentBill.exceptions.BillPaymentException;
 import lombok.Getter;
@@ -6,10 +6,10 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 public class UserVO {
-    private String userId;
-    private String userMobileNo;
-    private String serialId;
-    private String ssn;
+    private final String userId;
+    private final String userMobileNo;
+    private final String serialId;
+    private final String ssn;
 
     private UserVO(String userId,
                    String userMobileNo,

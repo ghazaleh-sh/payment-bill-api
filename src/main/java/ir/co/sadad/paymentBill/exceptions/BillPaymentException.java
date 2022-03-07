@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 @Getter
 public class BillPaymentException extends RuntimeException {
 
+    private static final long serialVersionUID = -3198038928433281102L;
     private final HttpStatus httpStatus;
     private Integer code;
     private GlobalErrorResponse globalErrorResponse;

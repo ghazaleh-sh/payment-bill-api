@@ -2,7 +2,7 @@ package ir.co.sadad.paymentBill.services;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import ir.co.sadad.paymentBill.RequestParamVO;
+import ir.co.sadad.paymentBill.commons.RequestParamVO;
 import ir.co.sadad.paymentBill.dtos.GeneralRegistrationResponse;
 import ir.co.sadad.paymentBill.dtos.GeneralVerificationResponse;
 import ir.co.sadad.paymentBill.dtos.PaymentVerificationResDto;

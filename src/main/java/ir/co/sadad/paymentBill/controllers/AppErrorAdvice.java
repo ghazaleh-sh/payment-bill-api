@@ -22,7 +22,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import static ir.co.sadad.paymentBill.Constants.ERROR_CODE_TAIL;
+import static ir.co.sadad.paymentBill.commons.Constants.ERROR_CODE_TAIL;
 
 @Slf4j
 @ControllerAdvice

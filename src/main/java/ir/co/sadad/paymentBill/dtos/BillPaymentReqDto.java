@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
+import java.io.Serializable;
 
 /**
  * dto for first request of payment- using by ipg payment and old registration
@@ -11,7 +12,9 @@ import javax.validation.constraints.NotBlank;
  * @author g.shahrokhabadi
  */
 @Data
-public class BillPaymentReqDto {
+public class BillPaymentReqDto implements Serializable {
+    private static final long serialVersionUID = 9150338863684768818L;
+
     @Schema(title = " شماره قبض")
     @NotBlank
     private String invoiceNumber;

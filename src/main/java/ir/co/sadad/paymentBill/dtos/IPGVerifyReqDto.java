@@ -3,6 +3,8 @@ package ir.co.sadad.paymentBill.dtos;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
+
 /**
  * dto for request verification ipg service
  *
@@ -11,7 +13,8 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class IPGVerifyReqDto {
+public class IPGVerifyReqDto implements Serializable {
+    private static final long serialVersionUID = -991129889563703351L;
 
     private String userId;
 

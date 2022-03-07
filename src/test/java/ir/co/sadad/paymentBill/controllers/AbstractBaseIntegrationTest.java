@@ -1,7 +1,7 @@
 package ir.co.sadad.paymentBill.controllers;
 
 
-import ir.co.sadad.paymentBill.UserVO;
+import ir.co.sadad.paymentBill.commons.UserVO;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -16,7 +16,7 @@ import java.time.Duration;
 public abstract class AbstractBaseIntegrationTest {
 
     protected WebTestClient webTestClient;
-    protected  TokenDto clientToken;
+    protected TokenDto clientToken;
     protected UserVO userVO;
 
     protected String userId = "158";

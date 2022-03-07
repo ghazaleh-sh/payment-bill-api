@@ -10,6 +10,7 @@ import java.io.Serializable;
 @Setter
 public class InvoicePk implements Serializable {
 
+    private static final long serialVersionUID = -2006387710941550321L;
     @Size(max = 13)
     private String invoiceNumber;
     @Size(max = 13)

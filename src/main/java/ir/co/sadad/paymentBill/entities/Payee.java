@@ -15,6 +15,8 @@ import java.sql.Timestamp;
 @Table(name = "PAYEE")
 public class Payee implements Serializable {
 
+    private static final long serialVersionUID = -401265587214644854L;
+
     public Payee() {
     }
 

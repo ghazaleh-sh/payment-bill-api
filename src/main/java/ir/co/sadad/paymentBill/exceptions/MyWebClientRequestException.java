@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @ResponseStatus(value = HttpStatus.REQUEST_TIMEOUT)
 public class MyWebClientRequestException extends BaseException {
 
+    private static final long serialVersionUID = -595950240566179207L;
+
     public MyWebClientRequestException(String messageCode) {
         this.code = messageCode;
     }

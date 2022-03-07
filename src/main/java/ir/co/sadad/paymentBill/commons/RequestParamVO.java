@@ -1,13 +1,13 @@
-package ir.co.sadad.paymentBill;
+package ir.co.sadad.paymentBill.commons;
 
 import lombok.Getter;
 
 @Getter
 public class RequestParamVO {
 
-    private String token;
-    private String signData;
-    private String orderId;
+    private final String token;
+    private final String signData;
+    private final String orderId;
 
     private RequestParamVO(String token, String signData, String orderId) {
         this.token = token;

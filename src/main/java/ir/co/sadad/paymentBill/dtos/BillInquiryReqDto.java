@@ -5,6 +5,7 @@ import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 import javax.validation.constraints.NotBlank;
+import java.io.Serializable;
 
 /**
  * request of bill inquiry service
@@ -12,8 +13,9 @@ import javax.validation.constraints.NotBlank;
  * @author g.shahrokhabadi
  */
 @Getter
-public class BillInquiryReqDto {
+public class BillInquiryReqDto implements Serializable {
 
+    private static final long serialVersionUID = -1873174039863373316L;
     @NotBlank
     private String invoiceNumber;
     @NotBlank

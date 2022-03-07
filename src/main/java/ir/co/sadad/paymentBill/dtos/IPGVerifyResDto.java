@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
+
 /**
  * dto for response of verification ipg service
  *
@@ -14,14 +16,15 @@ import lombok.Setter;
 @Getter
 @Setter
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class IPGVerifyResDto {
+public class IPGVerifyResDto implements Serializable {
 
+    private static final long serialVersionUID = -6282621006413961854L;
     @JsonProperty("SwitchResCode")
-    protected String switchResCode;
+    private String switchResCode;
     @JsonProperty("HashedCardNo")
-    protected String hashedCardNo;
+    private String hashedCardNo;
     @JsonProperty("CardNo")
-    protected String cardNo;
+    private String cardNo;
     @JsonProperty("ResCode")
     private Integer resCode;
     @JsonProperty("Amount")

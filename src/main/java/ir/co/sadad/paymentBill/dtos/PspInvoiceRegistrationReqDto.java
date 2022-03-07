@@ -11,11 +11,12 @@ import java.io.Serializable;
 @Setter
 @Getter
 //@SuperBuilder(toBuilder = true)
-public class PspInvoiceRegistrationReqDto extends RegisterDto implements Serializable {
+public class PspInvoiceRegistrationReqDto extends RegisterDto {
+    private static final long serialVersionUID = 4399440671130186223L;
     @JsonProperty("BillId")
-    protected String invoiceNumber;
+    private String invoiceNumber;
     @JsonProperty("PayId")
-    protected String paymentNumber;
+    private String paymentNumber;
     @JsonProperty("SignData")
     private String signData;
 

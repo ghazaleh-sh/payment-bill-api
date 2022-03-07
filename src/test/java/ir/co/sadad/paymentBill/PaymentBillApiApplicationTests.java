@@ -2,15 +2,11 @@ package ir.co.sadad.paymentBill;
 
 //import ir.co.sadad.paymentBill.validations.InvoiceValid;
 //import ir.co.sadad.paymentBill.validations.InvoiceValidator;
+import ir.co.sadad.paymentBill.commons.UserVO;
 import ir.co.sadad.paymentBill.validations.InvoiceValidator;
 import org.junit.jupiter.api.BeforeEach;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-
-import javax.validation.Validation;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
 
 @SpringBootTest
 @ActiveProfiles(profiles = {"qa"})

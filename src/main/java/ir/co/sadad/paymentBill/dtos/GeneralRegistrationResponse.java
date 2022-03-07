@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
+
 /**
  * dto for response of psp after registration
  *
@@ -13,8 +15,9 @@ import lombok.Setter;
 @Setter
 @Getter
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class GeneralRegistrationResponse {
+public class GeneralRegistrationResponse implements Serializable {
 
+    private static final long serialVersionUID = -7378834007761690877L;
     @JsonProperty("ResCode")
     private String resCode;
     @JsonProperty("Token")

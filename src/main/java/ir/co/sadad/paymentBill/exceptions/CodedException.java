@@ -9,6 +9,7 @@ import java.util.List;
 @Getter
 public class CodedException extends RuntimeException {
 
+    private static final long serialVersionUID = 7444389415841710379L;
     private transient int status;
     private String code;
     private String errorSummary;
